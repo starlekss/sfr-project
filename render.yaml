@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: sfr-project
+    runtime: python
+    buildCommand: |
+      apt-get update && apt-get install -y libpq-dev gcc
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn sfr_site.wsgi:application
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sfr-database
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
