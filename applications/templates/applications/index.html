@@ -160,14 +160,19 @@
 
                 <!-- Блок: Согласие -->
                 <div class="consent-section">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="agreeCheck" required>
-                        <label class="form-check-label" for="agreeCheck">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="consentCheck" required>
+                        <label class="form-check-label" for="consentCheck">
                             Я подтверждаю достоверность предоставленных данных и даю согласие на их обработку
                         </label>
                     </div>
                     <div class="consent-text">
-                        <small>Нажимая кнопку "Отправить заявление", вы подтверждаете, что ознакомлены с <a href="#">Политикой обработки персональных данных</a></small>
+                        <small class="text-muted">
+                            Нажимая кнопку "Отправить заявление", вы подтверждаете, что ознакомлены с
+                            <a href="{% url 'privacy_policy' %}" target="_blank" rel="noopener noreferrer">
+                                Политикой обработки персональных данных
+                            </a>
+                        </small>
                     </div>
                 </div>
 
