@@ -3,14 +3,18 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import FileResponse, JsonResponse  # ← ОБЪЕДИНИЛИ импорты
+from django.http import FileResponse, JsonResponse
 from django.core.files.uploadedfile import UploadedFile
+from django.contrib.auth.views import LoginView, LogoutView
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView
+from django.contrib.auth.forms import AuthenticationForm
 from .models import SocialApplication, Operator
-from .forms import SocialApplicationForm
+from .forms import SocialApplicationForm, UserRegistrationForm, UserProfileForm
 from loguru import logger
 import requests
 import traceback
-import os  # ← ДОБАВИЛИ os (нужен для download_pdf)
+import os
 
 
 def upload_to_fastapi(file, doc_type: str):
@@ -222,3 +226,82 @@ def create_admin(request):
 def privacy_policy(request):
     """Страница с политикой обработки персональных данных"""
     return render(request, 'applications/privacy_policy.html')
+
+
+class UserRegistrationView(CreateView):
+    """Регистрация пользователя"""
+    form_class = UserRegistrationForm
+    template_name = 'applications/register.html'
+    success_url = reverse_lazy('user_login')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = form.save()
+        auth_login(self.request, user)
+        messages.success(self.request, f'Добро пожаловать, {user.username}!')
+        return response
+
+
+class UserLoginView(LoginView):
+    """Вход пользователя"""
+    template_name = 'applications/user_login.html'
+    authentication_form = AuthenticationForm
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return reverse_lazy('user_profile')
+
+
+def user_logout(request):
+    """Выход пользователя"""
+    logout(request)
+    messages.success(request, 'Вы вышли из системы')
+    return redirect('index')
+
+
+@login_required
+def user_profile(request):
+    """Личный кабинет пользователя"""
+    user = request.user
+    applications = SocialApplication.objects.filter(snils=user.username).order_by('-created_at')[:10]
+
+    context = {
+        'user': user,
+        'applications': applications,
+    }
+    return render(request, 'applications/profile.html', context)
+
+
+@login_required
+def edit_profile(request):
+    """Редактирование профиля"""
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Профиль успешно обновлён!')
+            return redirect('user_profile')
+    else:
+        form = UserProfileForm(instance=request.user)
+
+    return render(request, 'applications/edit_profile.html', {'form': form})
+
+
+@login_required
+def my_applications(request):
+    """Мои заявки"""
+    applications = SocialApplication.objects.filter(snils=request.user.username).order_by('-created_at')
+
+    paginator = Paginator(applications, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'applications/my_applications.html', {'page_obj': page_obj})
+
+def citizen_login(request):
+    """Вход для граждан в личный кабинет"""
+    return render(request, 'applications/citizen_login.html')
+
+def citizen_register(request):
+    """Регистрация граждан"""
+    return render(request, 'applications/citizen_register.html')

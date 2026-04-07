@@ -1,0 +1,77 @@
+{% extends 'applications/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="form-card">
+            <div class="text-center mb-4">
+                <div class="form-icon-wrapper">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2 class="form-title">Регистрация гражданина</h2>
+                <p class="form-subtitle">Создайте учётную запись для отслеживания заявок</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label required-field">Фамилия</label>
+                        <input type="text" name="last_name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label required-field">Имя</label>
+                        <input type="text" name="first_name" class="form-control" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Отчество</label>
+                    <input type="text" name="patronymic" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label required-field">СНИЛС</label>
+                    <input type="text" name="snils" class="form-control" placeholder="123-456-789 01" required>
+                    <div class="form-hint">11 цифр без пробелов и дефисов</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label required-field">Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label required-field">Телефон</label>
+                    <input type="tel" name="phone" class="form-control" placeholder="+7 (XXX) XXX-XX-XX" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label required-field">Пароль</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label required-field">Подтверждение пароля</label>
+                    <input type="password" name="password_confirm" class="form-control" required>
+                </div>
+
+                <!-- Согласие -->
+                <div class="consent-section">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="consentCheck" required>
+                        <label class="form-check-label" for="consentCheck">
+                            Я принимаю условия <a href="{% url 'privacy_policy' %}" target="_blank">Политики обработки персональных данных</a>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary-custom w-100">
+                    <i class="fas fa-user-plus me-2"></i> Зарегистрироваться
+                </button>
+            </form>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    Уже зарегистрированы?
+                    <a href="{% url 'citizen_login' %}">Войти в личный кабинет</a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,13 +3,18 @@ from django.contrib.auth.models import AbstractUser
 
 
 class Operator(AbstractUser):
-    """Модель оператора"""
+    """Модель оператора и пользователя"""
     phone = models.CharField(max_length=20, blank=True, verbose_name="Телефон")
     position = models.CharField(max_length=100, blank=True, verbose_name="Должность")
 
+    # Дополнительные поля для пользователей
+    patronymic = models.CharField(max_length=100, blank=True, verbose_name="Отчество")  # Исправлено
+    date_of_birth = models.DateField(null=True, blank=True, verbose_name="Дата рождения")
+    address = models.TextField(blank=True, verbose_name="Адрес")
+
     class Meta:
-        verbose_name = "Оператор"
-        verbose_name_plural = "Операторы"
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
 
     def __str__(self):
         return f"{self.username} ({self.last_name} {self.first_name})"
@@ -33,13 +38,13 @@ class SocialApplication(models.Model):
     last_name = models.CharField(max_length=100, verbose_name="Фамилия")
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     patronymic = models.CharField(max_length=100, blank=True, verbose_name="Отчество")
-    snils = models.CharField(max_length=14, verbose_name="СНИЛС")
+    snils = models.CharField(max_length=14, verbose_name="СНИЛС", unique=True)  # Добавлено unique=True
 
     # Данные заявки
     service_type = models.CharField(max_length=200, verbose_name="Тип услуги")
     description = models.TextField(verbose_name="Описание")
 
-    # Сканы документов (с правильным upload_to)
+    # Сканы документов
     passport_scan = models.FileField(
         upload_to='documents/passports/',
         null=True,

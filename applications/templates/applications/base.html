@@ -1106,26 +1106,7 @@
             </li>
 
             {% if request.resolver_match.url_name == 'index' %}
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link-custom" href="{% url 'application_list' %}">
-                        <i class="fas fa-list me-1"></i> Список заявок
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link-custom" href="{% url 'operator_logout' %}">
-                        <i class="fas fa-sign-out-alt me-1"></i> Выйти
-                    </a>
-                </li>
-                {% else %}
-                <li class="nav-item ms-auto">
-                    <a class="nav-link-custom" href="{% url 'operator_login' %}">
-                        <i class="fas fa-user-lock me-1"></i> Вход для сотрудников
-                    </a>
-                </li>
-                {% endif %}
-
-            {% elif request.resolver_match.url_name == 'search_application' %}
+                <!-- На главной странице -->
                 <li class="nav-item">
                     <a class="nav-link-custom" href="#calculator">
                         <i class="fas fa-calculator me-1"></i> Калькулятор
@@ -1141,54 +1122,64 @@
                         <i class="fas fa-list me-1"></i> Услуги
                     </a>
                 </li>
+
+                <!-- Кнопки входа в правом углу -->
+                <li class="nav-item ms-auto">
+                    <a class="nav-link-custom" href="{% url 'citizen_login' %}">
+                        <i class="fas fa-user me-1"></i> Личный кабинет
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'operator_login' %}">
+                        <i class="fas fa-user-lock me-1"></i> Вход для сотрудников
+                    </a>
+                </li>
+
+            {% elif request.resolver_match.url_name == 'search_application' %}
+                <!-- На странице поиска -->
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="#calculator">
+                        <i class="fas fa-calculator me-1"></i> Калькулятор
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="#map">
+                        <i class="fas fa-map-marker-alt me-1"></i> Отделения
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link-custom" href="{% url 'search_application' %}">
                         <i class="fas fa-search me-1"></i> Проверить статус
                     </a>
                 </li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link-custom" href="{% url 'application_list' %}">
-                        <i class="fas fa-list me-1"></i> Список заявок
+                <li class="nav-item ms-auto">
+                    <a class="nav-link-custom" href="{% url 'citizen_login' %}">
+                        <i class="fas fa-user me-1"></i> Личный кабинет
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link-custom" href="{% url 'operator_logout' %}">
-                        <i class="fas fa-sign-out-alt me-1"></i> Выйти
-                    </a>
-                </li>
-                {% else %}
                 <li class="nav-item">
                     <a class="nav-link-custom" href="{% url 'operator_login' %}">
-                        <i class="fas fa-user-lock me-1"></i> Вход
+                        <i class="fas fa-user-lock me-1"></i> Вход для сотрудников
                     </a>
                 </li>
-                {% endif %}
 
             {% else %}
+                <!-- На остальных страницах -->
                 <li class="nav-item">
                     <a class="nav-link-custom" href="{% url 'search_application' %}">
                         <i class="fas fa-search me-1"></i> Проверить статус
                     </a>
                 </li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link-custom {% if request.resolver_match.url_name == 'application_list' %}active{% endif %}" href="{% url 'application_list' %}">
-                        <i class="fas fa-list me-1"></i> Список заявок
+                <li class="nav-item ms-auto">
+                    <a class="nav-link-custom" href="{% url 'citizen_login' %}">
+                        <i class="fas fa-user me-1"></i> Личный кабинет
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link-custom" href="{% url 'operator_logout' %}">
-                        <i class="fas fa-sign-out-alt me-1"></i> Выйти
-                    </a>
-                </li>
-                {% else %}
                 <li class="nav-item">
                     <a class="nav-link-custom" href="{% url 'operator_login' %}">
-                        <i class="fas fa-user-lock me-1"></i> Вход
+                        <i class="fas fa-user-lock me-1"></i> Вход для сотрудников
                     </a>
                 </li>
-                {% endif %}
             {% endif %}
         </ul>
     </div>

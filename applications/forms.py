@@ -1,5 +1,8 @@
+# applications/forms.py
+
 from django import forms
-from .models import SocialApplication
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from .models import SocialApplication, Operator
 
 
 class SocialApplicationForm(forms.ModelForm):
@@ -8,8 +11,7 @@ class SocialApplicationForm(forms.ModelForm):
         fields = ['last_name', 'first_name', 'patronymic', 'snils',
                   'service_type', 'description', 'passport_scan', 'snils_scan', 'additional_docs']
         widgets = {
-            'description': forms.Textarea(
-                attrs={'rows': 4, 'class': 'form-control', 'placeholder': 'Опишите вашу ситуацию подробно...'}),
+            'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Иванов'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Иван'}),
             'patronymic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Иванович'}),
@@ -29,10 +31,44 @@ class SocialApplicationForm(forms.ModelForm):
 
     def clean_snils(self):
         snils = self.cleaned_data.get('snils')
-        # Простая валидация СНИЛС
         if snils:
-            # Удаляем пробелы и дефисы
             snils_clean = snils.replace(' ', '').replace('-', '')
             if not snils_clean.isdigit() or len(snils_clean) != 11:
                 raise forms.ValidationError('СНИЛС должен содержать 11 цифр')
         return snils
+
+
+class UserRegistrationForm(UserCreationForm):
+    """Форма регистрации пользователя"""
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    patronymic = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = Operator
+        fields = ['username', 'email', 'first_name', 'last_name', 'patronymic', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in ['username', 'password1', 'password2']:
+            self.fields[field].widget.attrs['class'] = 'form-control'
+
+
+class UserProfileForm(UserChangeForm):
+    """Форма редактирования профиля"""
+    password = None
+
+    class Meta:
+        model = Operator
+        fields = ['username', 'email', 'first_name', 'last_name', 'patronymic', 'phone', 'date_of_birth', 'address']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'patronymic': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'date_of_birth': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
