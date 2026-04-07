@@ -940,6 +940,24 @@
             color: var(--white);
         }
 
+        /* Стили для ссылки на политику */
+        .consent-text a {
+        color: var(--sfr-blue);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s;
+        }
+
+        .consent-text a:hover {
+        text-decoration: underline;
+        color: var(--sfr-blue-dark);
+        }
+
+/* Стили для открытия ссылки в новой вкладке */
+.consent-text a[target="_blank"]::after {
+    content: " ↗";
+    font-size: 11px;
+}
         /* Анимации */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
