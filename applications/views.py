@@ -3,14 +3,14 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse  # ← ОБЪЕДИНИЛИ импорты
 from django.core.files.uploadedfile import UploadedFile
 from .models import SocialApplication, Operator
 from .forms import SocialApplicationForm
 from loguru import logger
-from django.http import JsonResponse
 import requests
 import traceback
+import os  # ← ДОБАВИЛИ os (нужен для download_pdf)
 
 
 def upload_to_fastapi(file, doc_type: str):
@@ -208,11 +208,11 @@ User = get_user_model()
 
 def create_admin(request):
     """Временный эндпоинт для создания администратора"""
-    if not User.objects.filter(username='admin').exists():
+    if not User.objects.filter(username='Zubkova').exists():
         User.objects.create_superuser(
             username='Zubkova',
             email='zubkova.v1k@yandex.ru',
             password='1234'
         )
-        return JsonResponse({'status': 'Admin created! Login: admin, Password: admin123'})
+        return JsonResponse({'status': 'Admin created!', 'username': 'Zubkova', 'password': '1234'})
     return JsonResponse({'status': 'Admin already exists'})
