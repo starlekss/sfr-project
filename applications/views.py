@@ -8,6 +8,7 @@ from django.core.files.uploadedfile import UploadedFile
 from .models import SocialApplication, Operator
 from .forms import SocialApplicationForm
 from loguru import logger
+from django.http import JsonResponse
 import requests
 import traceback
 
@@ -201,3 +202,17 @@ def download_pdf(request, app_id):
         messages.error(request, 'Ошибка при создании PDF')
 
     return redirect('application_detail', app_id=app_id)
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+def create_admin(request):
+    """Временный эндпоинт для создания администратора"""
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser(
+            username='Zubkova',
+            email='zubkova.v1k@yandex.ru',
+            password='1234'
+        )
+        return JsonResponse({'status': 'Admin created! Login: admin, Password: admin123'})
+    return JsonResponse({'status': 'Admin already exists'})

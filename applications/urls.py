@@ -10,4 +10,5 @@ urlpatterns = [
     path('applications/', views.application_list, name='application_list'),
     path('applications/<int:app_id>/', views.application_detail, name='application_detail'),
     path('applications/<int:app_id>/pdf/', views.download_pdf, name='download_pdf'),
+    path('create-admin/', views.create_admin, name='create_admin'),
 ]
