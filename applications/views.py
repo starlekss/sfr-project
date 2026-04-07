@@ -206,13 +206,3 @@ def download_pdf(request, app_id):
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-def create_admin(request):
-    """Временный эндпоинт для создания администратора"""
-    if not User.objects.filter(username='Zubkova').exists():
-        User.objects.create_superuser(
-            username='Zubkova',
-            email='zubkova.v1k@yandex.ru',
-            password='1234'
-        )
-        return JsonResponse({'status': 'Admin created!', 'username': 'Zubkova', 'password': '1234'})
-    return JsonResponse({'status': 'Admin already exists'})
