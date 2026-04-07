@@ -203,6 +203,4 @@ def download_pdf(request, app_id):
 
     return redirect('application_detail', app_id=app_id)
 
-from django.contrib.auth import get_user_model
-User = get_user_model()
 
