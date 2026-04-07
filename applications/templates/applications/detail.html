@@ -1,0 +1,111 @@
+{% extends 'applications/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="form-card">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h2>Заявка №{{ app.id }}</h2>
+                    <p class="text-muted">Дата подачи: {{ app.created_at|date:"d.m.Y H:i" }}</p>
+                </div>
+                <span class="status-badge
+                    {% if app.status == 'new' %}status-new
+                    {% elif app.status == 'processing' %}status-processing
+                    {% elif app.status == 'completed' %}status-completed
+                    {% else %}status-rejected{% endif %}" style="font-size: 16px;">
+                    {{ app.get_status_display }}
+                </span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-section">
+                        <h6><i class="fas fa-user-circle me-2"></i>Личные данные</h6>
+                        <div class="info-row">
+                            <span class="info-label">ФИО:</span>
+                            <span class="info-value">{{ app.last_name }} {{ app.first_name }} {{ app.patronymic }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">СНИЛС:</span>
+                            <span class="info-value">{{ app.snils }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-section">
+                        <h6><i class="fas fa-info-circle me-2"></i>Информация</h6>
+                        <div class="info-row">
+                            <span class="info-label">Тип услуги:</span>
+                            <span class="info-value">{{ app.service_type }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Обновлено:</span>
+                            <span class="info-value">{{ app.updated_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h6><i class="fas fa-align-left me-2"></i>Описание</h6>
+                <div class="description-box">
+                    {{ app.description|linebreaks }}
+                </div>
+            </div>
+
+            {% if app.passport_scan or app.snils_scan or app.additional_docs %}
+            <div class="info-section">
+                <h6><i class="fas fa-paperclip me-2"></i>Документы</h6>
+                <div class="docs-list">
+                    {% if app.passport_scan %}
+                    <a href="{{ app.passport_scan.url }}" class="doc-link" target="_blank">
+                        <i class="fas fa-file-pdf"></i> Паспорт
+                    </a>
+                    {% endif %}
+                    {% if app.snils_scan %}
+                    <a href="{{ app.snils_scan.url }}" class="doc-link" target="_blank">
+                        <i class="fas fa-file-image"></i> СНИЛС
+                    </a>
+                    {% endif %}
+                    {% if app.additional_docs %}
+                    <a href="{{ app.additional_docs.url }}" class="doc-link" target="_blank">
+                        <i class="fas fa-file-alt"></i> Доп. документы
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <hr>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Изменить статус</label>
+                        <select name="status" class="form-select">
+                            <option value="new" {% if app.status == 'new' %}selected{% endif %}> Новая</option>
+                            <option value="processing" {% if app.status == 'processing' %}selected{% endif %}> На рассмотрении</option>
+                            <option value="completed" {% if app.status == 'completed' %}selected{% endif %}> Выполнена</option>
+                            <option value="rejected" {% if app.status == 'rejected' %}selected{% endif %}> Отказано</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Комментарий сотрудника</label>
+                        <textarea name="comment" class="form-control" rows="4">{{ app.employee_comment }}</textarea>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary-custom px-4">
+                        <i class="fas fa-save me-2"></i> Сохранить изменения
+                    </button>
+                    <a href="{% url 'application_list' %}" class="btn btn-outline-custom px-4 ms-2">
+                        <i class="fas fa-arrow-left me-2"></i> Назад
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

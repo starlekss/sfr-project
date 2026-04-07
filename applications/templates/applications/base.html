@@ -1,0 +1,1524 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СФР - Социальный фонд России | Приём заявок</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Yandex Maps API -->
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ&lang=ru_RU" type="text/javascript"></script>
+
+    <style>
+        /* ========================================
+           ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        ======================================== */
+        :root {
+            --sfr-blue: #0054a6;
+            --sfr-blue-dark: #003d7a;
+            --sfr-blue-light: #e6f0fa;
+            --sfr-gold: #c6a23b;
+            --sfr-gold-dark: #a8842a;
+            --sfr-gray: #6c757d;
+            --sfr-gray-light: #f8f9fa;
+            --sfr-gray-dark: #343a40;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --white: #ffffff;
+            --black: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--sfr-gray-light);
+            color: var(--sfr-gray-dark);
+            line-height: 1.5;
+        }
+
+        /* Верхняя панель */
+        .top-bar {
+            background: var(--sfr-gray-dark);
+            color: var(--white);
+            font-size: 13px;
+            padding: 8px 0;
+        }
+
+        /* Хедер */
+        .main-header {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--sfr-blue);
+            margin: 0;
+        }
+
+        .logo p {
+            font-size: 12px;
+            color: var(--sfr-gray);
+            margin: 0;
+        }
+
+        .gov-badge {
+            background: var(--sfr-blue-light);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        /* Навигация */
+        .nav-menu {
+            background: var(--white);
+            border-top: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            padding-left: 0;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+        .nav-item {
+            display: list-item;
+        }
+
+        .nav-link-custom {
+            color: var(--sfr-gray-dark);
+            font-weight: 500;
+            padding: 12px 20px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-link-custom:hover {
+            color: var(--sfr-blue);
+            background: var(--sfr-blue-light);
+        }
+
+        .nav-link-custom.active {
+            color: var(--sfr-blue);
+            position: relative;
+        }
+
+        .nav-link-custom.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: var(--sfr-blue);
+        }
+
+        /* ========================================
+           БЛОК: ЖИВАЯ СТАТИСТИКА
+        ======================================== */
+        .stats-section {
+            background: linear-gradient(135deg, var(--sfr-blue) 0%, var(--sfr-blue-dark) 100%);
+            padding: 40px 0;
+            margin-bottom: 40px;
+            border-radius: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 1%, transparent 1%);
+            background-size: 50px 50px;
+            animation: moveBackground 60s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes moveBackground {
+            from { transform: translate(0, 0); }
+            to { transform: translate(50px, 50px); }
+        }
+
+        .stat-card {
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 10px;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        /* Блок быстрых действий */
+        .quick-actions {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,84,166,0.1);
+        }
+
+        .quick-actions-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--sfr-gray-dark);
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .action-card {
+            background: var(--sfr-gray-light);
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            border: 1px solid #e9ecef;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            background: var(--sfr-blue-light);
+            border-color: var(--sfr-blue);
+            box-shadow: 0 10px 25px rgba(0,84,166,0.15);
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--white);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .action-card:hover .action-icon {
+            background: var(--sfr-blue);
+        }
+
+        .action-card:hover .action-icon i {
+            color: var(--white);
+        }
+
+        .action-icon i {
+            font-size: 28px;
+            color: var(--sfr-blue);
+            transition: all 0.3s;
+        }
+
+        .action-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--sfr-gray-dark);
+        }
+
+        .action-desc {
+            font-size: 12px;
+            color: var(--sfr-gray);
+        }
+
+        /* Форма */
+        .form-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,84,166,0.1);
+            margin-top: 20px;
+        }
+
+        .form-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--sfr-blue-light), var(--white));
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            border: 2px solid var(--sfr-blue);
+        }
+
+        .form-icon-wrapper i {
+            font-size: 32px;
+            color: var(--sfr-blue);
+        }
+
+        .form-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--sfr-gray-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-subtitle {
+            color: var(--sfr-gray);
+            font-size: 14px;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+            padding: 20px;
+            background: var(--sfr-gray-light);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(0,84,166,0.1);
+        }
+
+        .section-header i {
+            font-size: 24px;
+            color: var(--sfr-blue);
+        }
+
+        .section-header h5 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--sfr-gray-dark);
+        }
+
+        .optional-badge {
+            margin-left: auto;
+            background: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--sfr-gray);
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--sfr-gray-dark);
+            font-size: 14px;
+        }
+
+        .required-field::after {
+            content: '*';
+            color: var(--danger);
+            margin-left: 4px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: all 0.3s;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--sfr-blue);
+            box-shadow: 0 0 0 3px rgba(0,84,166,0.1);
+            outline: none;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--sfr-gray);
+            font-size: 14px;
+            z-index: 1;
+        }
+
+        .input-with-icon input,
+        .input-with-icon select,
+        .input-with-icon textarea {
+            padding-left: 42px;
+        }
+
+        .form-hint {
+            font-size: 11px;
+            color: var(--sfr-gray);
+            margin-top: 6px;
+        }
+
+        /* Карточки загрузки */
+        .upload-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid #e2e8f0;
+            height: 100%;
+        }
+
+        .upload-card:hover {
+            border-color: var(--sfr-blue);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .upload-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--sfr-blue-light);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .upload-icon i {
+            font-size: 24px;
+            color: var(--sfr-blue);
+        }
+
+        .upload-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--sfr-gray-dark);
+        }
+
+        .upload-area {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 2;
+            top: 0;
+            left: 0;
+        }
+
+        .upload-placeholder {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            background: var(--sfr-gray-light);
+        }
+
+        .upload-area:hover .upload-placeholder {
+            border-color: var(--sfr-blue);
+            background: rgba(0,84,166,0.02);
+        }
+
+        .upload-placeholder i {
+            font-size: 32px;
+            color: var(--sfr-gray);
+            margin-bottom: 10px;
+        }
+
+        .upload-placeholder p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--sfr-gray);
+        }
+
+        .upload-placeholder span {
+            font-size: 10px;
+            color: var(--sfr-gray);
+        }
+
+        .upload-preview {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--sfr-blue-light);
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        .upload-preview i {
+            font-size: 20px;
+            color: var(--sfr-blue);
+        }
+
+        .upload-preview .file-name {
+            flex: 1;
+            font-size: 12px;
+            color: var(--sfr-gray-dark);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .upload-note {
+            margin-top: 15px;
+            padding: 12px;
+            background: var(--sfr-blue-light);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--sfr-gray);
+            text-align: center;
+        }
+
+        /* Согласие */
+        .consent-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--sfr-blue-light);
+            border-radius: 16px;
+        }
+
+        .form-check {
+            margin-bottom: 12px;
+        }
+
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            border: 2px solid var(--sfr-gray);
+            margin-right: 10px;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--sfr-blue);
+            border-color: var(--sfr-blue);
+        }
+
+        .form-check-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--sfr-gray-dark);
+            cursor: pointer;
+        }
+
+        .consent-text {
+            padding-left: 28px;
+        }
+
+        .consent-text a {
+            color: var(--sfr-blue);
+            text-decoration: none;
+        }
+
+        /* Кнопки */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--sfr-blue), var(--sfr-blue-dark));
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(0,84,166,0.3);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,84,166,0.4);
+        }
+
+        .btn-outline-custom {
+            border: 2px solid var(--sfr-blue);
+            background: transparent;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--sfr-blue);
+            transition: all 0.3s;
+        }
+
+        .btn-outline-custom:hover {
+            background: var(--sfr-blue);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .btn-gold-custom {
+            background: var(--sfr-gold);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--black);
+        }
+
+        .btn-gold-custom:hover {
+            background: var(--sfr-gold-dark);
+            color: var(--white);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Калькулятор */
+        .calculator-card {
+            background: var(--sfr-blue-light);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 30px;
+        }
+
+        .calculator-result {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .calculator-result .amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--sfr-blue);
+        }
+
+        /* Карта */
+        .map-container {
+            height: 450px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .office-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .office-card:hover {
+            border-color: var(--sfr-blue);
+            transform: translateX(5px);
+        }
+
+        .office-name {
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--sfr-blue);
+        }
+
+        /* Чат-бот */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chat-button {
+            width: 50px;
+            height: 50px;
+            background: var(--sfr-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.05);
+            background: var(--sfr-gold-dark);
+        }
+
+        .chat-button i {
+            font-size: 24px;
+            color: var(--black);
+        }
+
+        .chat-window {
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            width: 320px;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+            overflow: hidden;
+        }
+
+        .chat-window.active {
+            display: block;
+            animation: slideUp 0.2s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-header {
+            background: var(--sfr-blue);
+            color: var(--white);
+            padding: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            height: 280px;
+            overflow-y: auto;
+            padding: 12px;
+            background: var(--sfr-gray-light);
+            font-size: 13px;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            display: flex;
+        }
+
+        .chat-message.bot {
+            justify-content: flex-start;
+        }
+
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 85%;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .chat-message.bot .message-bubble {
+            background: var(--white);
+            border: 1px solid #e9ecef;
+        }
+
+        .chat-message.user .message-bubble {
+            background: var(--sfr-blue);
+            color: var(--white);
+        }
+
+        .quick-replies {
+            padding: 8px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            border-top: 1px solid #e9ecef;
+            background: var(--white);
+        }
+
+        .quick-reply {
+            background: var(--sfr-blue-light);
+            border: none;
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 11px;
+            color: var(--sfr-blue);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-reply:hover {
+            background: var(--sfr-blue);
+            color: white;
+        }
+
+        .chat-input {
+            padding: 10px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 8px;
+            background: var(--white);
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: 1px solid #e9ecef;
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .chat-input button {
+            background: var(--sfr-blue);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: var(--white);
+            font-size: 12px;
+        }
+
+        /* Уведомления */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid var(--info);
+        }
+
+        /* Список заявок (таблица) */
+        .applications-table {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .applications-table th {
+            background: var(--sfr-blue);
+            color: var(--white);
+            padding: 15px;
+            font-weight: 600;
+        }
+
+        .applications-table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+        }
+
+        .applications-table tr:hover {
+            background: var(--sfr-blue-light);
+        }
+
+        /* Пагинация */
+        .pagination-custom {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 30px;
+        }
+
+        .pagination-custom .page-link {
+            background: var(--white);
+            border: 1px solid #e2e8f0;
+            color: var(--sfr-blue);
+            border-radius: 8px;
+            padding: 8px 14px;
+            transition: all 0.3s;
+        }
+
+        .pagination-custom .page-link:hover {
+            background: var(--sfr-blue);
+            color: var(--white);
+            border-color: var(--sfr-blue);
+        }
+
+        .pagination-custom .active .page-link {
+            background: var(--sfr-blue);
+            color: var(--white);
+            border-color: var(--sfr-blue);
+        }
+
+        /* Футер */
+        .footer {
+            background: var(--sfr-gray-dark);
+            color: var(--white);
+            padding: 40px 0 25px;
+            margin-top: 50px;
+        }
+
+        .footer a {
+            color: #adb5bd;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: var(--white);
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .animate-slideInRight {
+            animation: slideInRight 0.3s ease forwards;
+        }
+
+        /* Анимация для цифр статистики */
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-number {
+            animation: countUp 0.8s ease-out;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .stat-number {
+                font-size: 32px;
+            }
+            .stat-label {
+                font-size: 11px;
+            }
+            .action-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-card {
+                padding: 24px;
+            }
+            .form-title {
+                font-size: 24px;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            .btn-primary-custom, .btn-outline-custom {
+                width: 100%;
+                text-align: center;
+            }
+            .section-header {
+                flex-wrap: wrap;
+            }
+            .optional-badge {
+                margin-left: 0;
+            }
+            .chat-window {
+                width: 280px;
+                right: -15px;
+            }
+            .map-container {
+                height: 300px;
+                margin-top: 15px;
+            }
+            .logo h1 {
+                font-size: 18px;
+            }
+            .nav-link-custom {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .applications-table {
+                font-size: 12px;
+            }
+            .applications-table th,
+            .applications-table td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Верхняя панель -->
+<div class="top-bar">
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <i class="fas fa-phone-alt me-2"></i> 8-800-100-00-01
+            </div>
+            <div class="col-6 text-end">
+                <i class="fas fa-clock me-2"></i> Пн-Пт: 8:30 - 17:30
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Хедер -->
+<div class="main-header">
+    <div class="container">
+        <div class="row align-items-center py-3">
+            <div class="col-md-7">
+                <div class="logo d-flex align-items-center">
+                    <img src="{% static 'applications/images/logo-sfr.png' %}"
+                         alt="Логотип Социального фонда России"
+                         style="height: 55px; width: auto; margin-right: 15px;">
+                    <div>
+        <h1 class="mb-0">Социальный фонд России</h1>
+        <p class="mb-0">Прием заявок по Самарской области</p>
+    </div>
+</div>
+            </div>
+            <div class="col-md-5 text-end">
+                <div class="gov-badge d-inline-block">
+                    <i class="fas fa-check-circle"></i>
+                    <small>Государственная услуга</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Навигация -->
+<div class="nav-menu">
+    <div class="container">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link-custom {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">
+                    <i class="fas fa-home me-1"></i> Главная
+                </a>
+            </li>
+
+            {% if request.resolver_match.url_name == 'index' %}
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'application_list' %}">
+                        <i class="fas fa-list me-1"></i> Список заявок
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'operator_logout' %}">
+                        <i class="fas fa-sign-out-alt me-1"></i> Выйти
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item ms-auto">
+                    <a class="nav-link-custom" href="{% url 'operator_login' %}">
+                        <i class="fas fa-user-lock me-1"></i> Вход для сотрудников
+                    </a>
+                </li>
+                {% endif %}
+
+            {% elif request.resolver_match.url_name == 'search_application' %}
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="#calculator">
+                        <i class="fas fa-calculator me-1"></i> Калькулятор
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="#map">
+                        <i class="fas fa-map-marker-alt me-1"></i> Отделения
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="#services">
+                        <i class="fas fa-list me-1"></i> Услуги
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'search_application' %}">
+                        <i class="fas fa-search me-1"></i> Проверить статус
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'application_list' %}">
+                        <i class="fas fa-list me-1"></i> Список заявок
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'operator_logout' %}">
+                        <i class="fas fa-sign-out-alt me-1"></i> Выйти
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'operator_login' %}">
+                        <i class="fas fa-user-lock me-1"></i> Вход
+                    </a>
+                </li>
+                {% endif %}
+
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'search_application' %}">
+                        <i class="fas fa-search me-1"></i> Проверить статус
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link-custom {% if request.resolver_match.url_name == 'application_list' %}active{% endif %}" href="{% url 'application_list' %}">
+                        <i class="fas fa-list me-1"></i> Список заявок
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'operator_logout' %}">
+                        <i class="fas fa-sign-out-alt me-1"></i> Выйти
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link-custom" href="{% url 'operator_login' %}">
+                        <i class="fas fa-user-lock me-1"></i> Вход
+                    </a>
+                </li>
+                {% endif %}
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+<!-- Блок статистики и быстрых действий (только на главной) -->
+{% if request.resolver_match.url_name == 'index' %}
+<div class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-number" data-target="1500000">0</div>
+                    <div class="stat-label">Получателей выплат<br>в Самарской области</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="stat-number" data-target="13211">0</div>
+                    <div class="stat-label">Семей получили<br>материнский капитал в 2025г</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-number" data-target="5">0</div>
+                    <div class="stat-label">Средний срок рассмотрения<br>заявления (дня)</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-star"></i></div>
+                    <div class="stat-number" data-target="98">0</div>
+                    <div class="stat-label">Удовлетворенных заявлений<br>в 2025 году, %</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="quick-actions">
+        <h3 class="quick-actions-title">Быстрые действия</h3>
+        <div class="action-grid">
+            <a href="{% url 'index' %}" class="action-card">
+                <div class="action-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="action-title">Подать заявление</div>
+                <div class="action-desc">Оформите услугу онлайн</div>
+            </a>
+            <a href="{% url 'search_application' %}" class="action-card">
+                <div class="action-icon"><i class="fas fa-search"></i></div>
+                <div class="action-title">Проверить статус</div>
+                <div class="action-desc">Узнайте, на каком этапе ваша заявка</div>
+            </a>
+            <a href="#calculator" class="action-card">
+                <div class="action-icon"><i class="fas fa-calculator"></i></div>
+                <div class="action-title">Калькулятор пенсии</div>
+                <div class="action-desc">Предварительный расчет</div>
+            </a>
+            <a href="#map" class="action-card">
+                <div class="action-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="action-title">Найти отделение</div>
+                <div class="action-desc">Ближайшие офисы СФР</div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Основной контент -->
+<main class="container mt-4 mb-5">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} animate-fadeIn" role="alert">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+</main>
+
+<!-- Калькулятор пенсии и карта (только на главной) -->
+{% if request.resolver_match.url_name == 'index' %}
+<section id="calculator" class="container mb-5">
+    <div class="calculator-card">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="mb-4">Калькулятор пенсии</h3>
+                <p class="text-muted">Предварительный расчет страховой пенсии по старости</p>
+                <div class="mb-3">
+                    <label class="form-label">Стаж работы (лет)</label>
+                    <input type="number" id="experience" class="form-control" value="25">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Средняя зарплата (руб.)</label>
+                    <input type="number" id="salary" class="form-control" value="50000">
+                </div>
+                <button class="btn-gold-custom w-100" onclick="calculatePension()">Рассчитать пенсию</button>
+            </div>
+            <div class="col-md-6">
+                <div class="calculator-result">
+                    <p class="text-muted mb-2">Предполагаемый размер пенсии</p>
+                    <div class="amount" id="pensionResult">0 ₽</div>
+                    <small>*Расчет является предварительным</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="map" class="container mb-5">
+    <h3 class="mb-4">Отделения Социального фонда России в Самарской области</h3>
+    <div class="row">
+        <div class="col-md-5">
+            <div class="offices-list">
+                <div class="office-card" data-lat="53.195878" data-lng="50.100202">
+                    <div class="office-name">Отделение СФР по Самарской области</div>
+                    <div class="office-address"><i class="fas fa-map-marker-alt me-2"></i>г. Самара, ул. Садовая, 175</div>
+                    <div class="office-hours"><i class="fas fa-clock me-2"></i>Пн-Пт: 9:00-18:00</div>
+                </div>
+                <div class="office-card" data-lat="53.203156" data-lng="50.155952">
+                    <div class="office-name">Клиентская служба Ленинского района</div>
+                    <div class="office-address"><i class="fas fa-map-marker-alt me-2"></i>г. Самара, ул. Куйбышева, 111</div>
+                    <div class="office-hours"><i class="fas fa-clock me-2"></i>Пн-Пт: 9:00-18:00, Сб: 10:00-15:00</div>
+                </div>
+                <div class="office-card" data-lat="53.524710" data-lng="49.415125">
+                    <div class="office-name">Клиентская служба г. Тольятти</div>
+                    <div class="office-address"><i class="fas fa-map-marker-alt me-2"></i>г. Тольятти, ул. Ленина, 18</div>
+                    <div class="office-hours"><i class="fas fa-clock me-2"></i>Пн-Пт: 9:00-18:00, Сб: 10:00-14:00</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div id="map-container" class="map-container"></div>
+        </div>
+    </div>
+</section>
+
+<div class="text-center mt-4">
+    <button class="btn-primary-custom" onclick="window.location.href='{% url 'index' %}'">
+        <i class="fas fa-file-alt me-2"></i> Подать заявление онлайн
+    </button>
+</div>
+{% endif %}
+
+<!-- Чат-бот -->
+<div class="chat-widget">
+    <div class="chat-button" onclick="toggleChat()">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span><i class="fas fa-robot me-2"></i>Помощник СФР</span>
+            <button class="btn-close btn-close-white" onclick="toggleChat()"></button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message bot">
+                <div class="message-bubble">Здравствуйте! Я виртуальный помощник СФР. Выберите тему:</div>
+            </div>
+        </div>
+        <div class="quick-replies">
+            <button class="quick-reply" onclick="sendQuickReply('пенсия')">Пенсия</button>
+            <button class="quick-reply" onclick="sendQuickReply('материнский капитал')">Материнский капитал</button>
+            <button class="quick-reply" onclick="sendQuickReply('выплаты')">Выплаты</button>
+            <button class="quick-reply" onclick="sendQuickReply('отделение')">Отделения</button>
+            <button class="quick-reply" onclick="sendQuickReply('статус')">Статус заявки</button>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Введите вопрос..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">→</button>
+        </div>
+    </div>
+</div>
+
+<!-- Футер -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <h5 class="fw-bold mb-2">Социальный фонд России</h5>
+                <p class="text-white-50 small">Отделение по Самарской области</p>
+                <p class="text-white-50 small">г. Самара, ул. Садовая, 175</p>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h6 class="fw-bold mb-2">Контакты</h6>
+                <ul class="list-unstyled small text-white-50">
+                    <li><i class="fas fa-phone me-2"></i>8-800-100-00-01</li>
+                    <li><i class="fas fa-envelope me-2"></i>info@sfr-samara.ru</li>
+                </ul>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h6 class="fw-bold mb-2">Режим работы</h6>
+                <ul class="list-unstyled small text-white-50">
+                    <li>Пн-Пт: 8:30 - 17:30</li>
+                    <li>Сб-Вс: выходной</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="bg-secondary">
+        <div class="text-center text-white-50 small">
+            © 2026 СФР по Самарской области
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Анимация цифр статистики
+    function animateNumbers() {
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach(stat => {
+            const target = parseInt(stat.getAttribute('data-target'));
+            let current = 0;
+            const increment = target / 50;
+            const stepTime = 2000 / 50;
+            const updateNumber = () => {
+                current += increment;
+                if (current < target) {
+                    if (target >= 1000) {
+                        stat.textContent = Math.floor(current).toLocaleString();
+                    } else {
+                        stat.textContent = Math.floor(current);
+                    }
+                    setTimeout(updateNumber, stepTime);
+                } else {
+                    stat.textContent = target >= 1000 ? target.toLocaleString() : target;
+                }
+            };
+            updateNumber();
+        });
+    }
+
+    // Калькулятор пенсии
+    function calculatePension() {
+        const experience = document.getElementById('experience')?.value || 0;
+        const salary = document.getElementById('salary')?.value || 0;
+        const fixedPayment = 8134.88;
+        const pointCost = 133.05;
+        const points = (salary / 100000) * experience;
+        const pension = fixedPayment + (points * pointCost);
+        const resultEl = document.getElementById('pensionResult');
+        if (resultEl) resultEl.innerHTML = Math.round(pension).toLocaleString() + ' ₽';
+    }
+
+    // Чат-бот
+    const botResponses = {
+        'пенсия': 'Пенсия по старости назначается мужчинам с 65 лет, женщинам с 60 лет. Необходим стаж не менее 15 лет. Для оформления нужны: паспорт, СНИЛС, трудовая книжка.',
+        'материнский капитал': 'Материнский капитал: 630 380 руб. на первого ребенка. Можно использовать на улучшение жилищных условий, образование детей, накопительную пенсию.',
+        'выплаты': 'Социальные выплаты: ЕДВ для льготников, пособие по уходу за ребенком, пособие на погребение, единовременное пособие при рождении.',
+        'отделение': 'Главное отделение: ул. Садовая, 175, тел. 8 (846) 334-55-66. Режим: Пн-Пт 8:30-17:30. На карте выше есть все отделения.',
+        'статус': 'Проверить статус заявки можно в личном кабинете на сайте СФР, через Госуслуги или по телефону 8-800-100-00-01.'
+    };
+    const defaultResponse = 'Уточните, пожалуйста, вопрос. Доступные темы: пенсия, материнский капитал, выплаты, отделения, статус заявки. Или позвоните 8-800-100-00-01.';
+
+    function getBotResponse(message) {
+        const lowerMsg = message.toLowerCase();
+        if (lowerMsg.includes('пенси')) return botResponses['пенсия'];
+        if (lowerMsg.includes('материн')) return botResponses['материнский капитал'];
+        if (lowerMsg.includes('выплат')) return botResponses['выплаты'];
+        if (lowerMsg.includes('отдел')) return botResponses['отделение'];
+        if (lowerMsg.includes('статус')) return botResponses['статус'];
+        return defaultResponse;
+    }
+
+    function addMessage(text, isUser) {
+        const container = document.getElementById('chatMessages');
+        if (!container) return;
+        const div = document.createElement('div');
+        div.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+        div.innerHTML = `<div class="message-bubble">${escapeHtml(text)}</div>`;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (!message) return;
+        addMessage(message, true);
+        input.value = '';
+        setTimeout(() => addMessage(getBotResponse(message), false), 300);
+    }
+
+    function sendQuickReply(topic) {
+        const response = botResponses[topic] || defaultResponse;
+        addMessage(topic, true);
+        setTimeout(() => addMessage(response, false), 200);
+    }
+
+    function toggleChat() {
+        const win = document.getElementById('chatWindow');
+        if (win) win.classList.toggle('active');
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Карты
+    if (typeof ymaps !== 'undefined' && document.getElementById('map-container')) {
+        ymaps.ready(initMap);
+        function initMap() {
+            const map = new ymaps.Map('map-container', {
+                center: [53.195878, 50.100202],
+                zoom: 11,
+                controls: ['zoomControl', 'fullscreenControl']
+            });
+            const offices = [
+                { coords: [53.195878, 50.100202], name: 'Отделение СФР по Самарской области', address: 'ул. Садовая, 175' },
+                { coords: [53.203156, 50.155952], name: 'Ленинский район', address: 'ул. Куйбышева, 111' },
+                { coords: [53.524710, 49.415125], name: 'г. Тольятти', address: 'ул. Ленина, 18' }
+            ];
+            offices.forEach(office => {
+                const placemark = new ymaps.Placemark(office.coords, {
+                    balloonContent: `<strong>${office.name}</strong><br>${office.address}`
+                }, { preset: 'islands#blueGovernmentIcon' });
+                map.geoObjects.add(placemark);
+            });
+            document.querySelectorAll('.office-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const lat = parseFloat(card.dataset.lat);
+                    const lng = parseFloat(card.dataset.lng);
+                    map.setCenter([lat, lng], 15, { duration: 500 });
+                });
+            });
+        }
+    }
+
+    // Автоскрытие уведомлений
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    }, 1000);
+
+    document.addEventListener('DOMContentLoaded', animateNumbers);
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

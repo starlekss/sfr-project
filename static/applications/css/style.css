@@ -1,0 +1,624 @@
+/* ========================================
+   ГЛАВНЫЕ СТИЛИ ДЛЯ САЙТА СФР
+   Современный градиентный дизайн
+   ======================================== */
+
+/* ---------- ПЕРЕМЕННЫЕ ---------- */
+:root {
+    --primary-start: #667eea;
+    --primary-end: #764ba2;
+    --primary-gradient: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    --secondary-color: #4a5568;
+    --success-color: #059669;
+    --warning-color: #d97706;
+    --danger-color: #dc2626;
+    --light-bg: #f7fafc;
+    --dark-text: #1a202c;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.1);
+    --shadow-xl: 0 30px 80px rgba(0,0,0,0.15);
+    --transition: all 0.3s ease;
+}
+
+/* ---------- БАЗОВЫЕ СТИЛИ ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--primary-gradient);
+    min-height: 100vh;
+    position: relative;
+    color: var(--dark-text);
+}
+
+/* Анимированный фон */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.05)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+    background-size: cover;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ---------- НАВИГАЦИЯ ---------- */
+.navbar {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-md);
+    padding: 1rem 0;
+    transition: var(--transition);
+}
+
+.navbar.scrolled {
+    padding: 0.5rem 0;
+    background: rgba(255, 255, 255, 0.98) !important;
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.5rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: var(--transition);
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+}
+
+.nav-link {
+    font-weight: 500;
+    color: var(--secondary-color) !important;
+    transition: var(--transition);
+    position: relative;
+    margin: 0 0.25rem;
+}
+
+.nav-link:hover {
+    color: var(--primary-start) !important;
+    transform: translateY(-2px);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--primary-gradient);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 80%;
+}
+
+/* ---------- КАРТОЧКИ ---------- */
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.glass-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-xl);
+}
+
+.card-header-gradient {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 1.5rem;
+}
+
+/* ---------- КНОПКИ ---------- */
+.btn-gradient {
+    background: var(--primary-gradient);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.btn-gradient:active {
+    transform: translateY(0);
+}
+
+.btn-gradient::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-gradient:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-outline-custom {
+    border: 2px solid var(--primary-start);
+    color: var(--primary-start);
+    background: transparent;
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.btn-outline-custom:hover {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+/* ---------- ФОРМЫ ---------- */
+.form-control, .form-select {
+    border-radius: 15px;
+    border: 2px solid #e2e8f0;
+    padding: 12px 15px;
+    transition: var(--transition);
+    font-size: 0.95rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-start);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    outline: none;
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--dark-text);
+}
+
+/* ---------- СТАТУС БЕЙДЖИ ---------- */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.status-new {
+    background: #e2e8f0;
+    color: var(--secondary-color);
+}
+
+.status-processing {
+    background: #fef3c7;
+    color: var(--warning-color);
+}
+
+.status-completed {
+    background: #d1fae5;
+    color: var(--success-color);
+}
+
+.status-rejected {
+    background: #fee2e2;
+    color: var(--danger-color);
+}
+
+/* ---------- ТРЕКЕР СТАТУСА ---------- */
+.status-tracker {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.status-tracker::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 0;
+}
+
+.status-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.status-step .step-icon {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: var(--transition);
+    position: relative;
+    z-index: 1;
+}
+
+.status-step.active .step-icon {
+    background: var(--primary-gradient);
+    border-color: var(--primary-start);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.status-step.completed .step-icon {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+.status-step .step-label {
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--secondary-color);
+}
+
+.status-step.active .step-label {
+    color: var(--primary-start);
+    font-weight: 600;
+}
+
+/* ---------- ПРОГРЕСС БАР ---------- */
+.progress-status {
+    height: 8px;
+    border-radius: 10px;
+    background: #e2e8f0;
+    overflow: hidden;
+    margin: 1.5rem 0;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+    background: var(--primary-gradient);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* ---------- ЗАГРУЗКА ФАЙЛОВ ---------- */
+.file-upload {
+    border: 2px dashed #e2e8f0;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    background: white;
+}
+
+.file-upload:hover {
+    border-color: var(--primary-start);
+    background: rgba(102, 126, 234, 0.05);
+    transform: translateY(-2px);
+}
+
+.file-upload input {
+    display: none;
+}
+
+/* ---------- АНИМАЦИИ ---------- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.animate-slideInLeft {
+    animation: slideInLeft 0.5s ease forwards;
+}
+
+.animate-slideInRight {
+    animation: slideInRight 0.5s ease forwards;
+}
+
+.animate-zoomIn {
+    animation: zoomIn 0.4s ease forwards;
+}
+
+/* ---------- АЛЕРТЫ ---------- */
+.alert {
+    border-radius: 15px;
+    border: none;
+    box-shadow: var(--shadow-sm);
+    animation: fadeInUp 0.5s ease;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: var(--success-color);
+}
+
+.alert-danger {
+    background: #fee2e2;
+    color: var(--danger-color);
+}
+
+.alert-warning {
+    background: #fef3c7;
+    color: var(--warning-color);
+}
+
+.alert-info {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+/* ---------- ТАБЛИЦЫ ---------- */
+.table {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.table thead th {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+}
+
+.table tbody tr {
+    transition: var(--transition);
+}
+
+.table tbody tr:hover {
+    background: #f7fafc;
+    transform: scale(1.01);
+}
+
+/* ---------- ПАГИНАЦИЯ ---------- */
+.pagination .page-link {
+    border-radius: 10px;
+    margin: 0 0.25rem;
+    color: var(--primary-start);
+    border: 1px solid #e2e8f0;
+    transition: var(--transition);
+}
+
+.pagination .page-link:hover {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+.pagination .active .page-link {
+    background: var(--primary-gradient);
+    border-color: transparent;
+}
+
+/* ---------- ФУТЕР ---------- */
+.footer {
+    background: rgba(255, 255, 255, 0.95);
+    margin-top: 100px;
+    padding: 3rem 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+}
+
+/* ---------- АДАПТИВНОСТЬ ---------- */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .glass-card {
+        margin: 1rem;
+    }
+
+    .status-tracker {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .status-tracker::before {
+        display: none;
+    }
+
+    .status-step {
+        width: 100%;
+    }
+
+    .btn-gradient {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 6px 15px;
+    }
+
+    .table {
+        font-size: 0.875rem;
+    }
+
+    .card-header-gradient h4 {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .glass-card {
+        padding: 1rem !important;
+    }
+
+    .status-step .step-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .status-step .step-label {
+        font-size: 0.7rem;
+    }
+}
+
+/* ---------- СКРОЛЛБАР ---------- */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-end);
+}
+
+/* ---------- ПЕЧАТЬ ---------- */
+@media print {
+    .navbar, .footer, .btn-gradient, .btn-outline-custom, .btn-outline-secondary {
+        display: none !important;
+    }
+
+    .glass-card {
+        box-shadow: none !important;
+        background: white !important;
+        border: 1px solid #ddd !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    .status-tracker {
+        break-inside: avoid;
+    }
+}

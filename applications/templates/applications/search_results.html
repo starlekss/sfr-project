@@ -1,0 +1,76 @@
+{% extends 'applications/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="form-card">
+            <div class="text-center mb-4">
+                <div class="form-icon-wrapper">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h2 class="form-title">Результаты поиска</h2>
+                <p class="form-subtitle">Найдено заявок: <strong>{{ applications.count }}</strong></p>
+            </div>
+
+            <div class="list-group">
+                {% for app in applications %}
+                <a href="{% url 'application_status' app.id %}" class="list-group-item list-group-item-action">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <strong>№{{ app.id }}</strong>
+                        </div>
+                        <div class="col-md-3">
+                            {{ app.last_name }} {{ app.first_name }}
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">{{ app.service_type|truncatechars:30 }}</small>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="badge
+                                {% if app.status == 'new' %}bg-secondary
+                                {% elif app.status == 'processing' %}bg-warning
+                                {% elif app.status == 'completed' %}bg-success
+                                {% else %}bg-danger{% endif %}">
+                                {{ app.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <small class="text-muted">{{ app.created_at|date:"d.m.Y" }}</small>
+                            <i class="fas fa-chevron-right ms-2"></i>
+                        </div>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Заявки не найдены</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'search_application' %}" class="btn-outline-custom">
+                    <i class="fas fa-search me-2"></i> Новый поиск
+                </a>
+                <a href="{% url 'index' %}" class="btn-primary-custom ms-2">
+                    <i class="fas fa-file-alt me-2"></i> Подать заявку
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .list-group-item {
+        border-radius: 12px !important;
+        margin-bottom: 10px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s;
+    }
+    .list-group-item:hover {
+        transform: translateX(5px);
+        border-color: var(--sfr-blue);
+        background: #f0f9ff;
+    }
+</style>
+{% endblock %}

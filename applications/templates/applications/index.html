@@ -1,0 +1,304 @@
+{% extends 'applications/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="form-card">
+            <!-- Заголовок формы -->
+            <div class="text-center mb-4">
+                <div class="form-icon-wrapper">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h2 class="form-title">Подача заявления в СФР</h2>
+                <p class="form-subtitle">Пожалуйста, заполните все обязательные поля. Поля со звездочкой <span class="text-danger">*</span> обязательны для заполнения</p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" id="applicationForm">
+                {% csrf_token %}
+
+                <!-- Блок: Личные данные -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-user-circle"></i>
+                        <h5>Личные данные</h5>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required-field">Фамилия</label>
+                            {{ form.last_name }}
+                            <div class="form-hint">Введите фамилию как в паспорте</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required-field">Имя</label>
+                            {{ form.first_name }}
+                            <div class="form-hint">Введите имя как в паспорте</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Отчество</label>
+                            {{ form.patronymic }}
+                            <div class="form-hint">Если есть, укажите отчество</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Блок: Документы -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-id-card"></i>
+                        <h5>Документы</h5>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label required-field">СНИЛС</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-hashtag"></i>
+                            {{ form.snils }}
+                        </div>
+                        <div class="form-hint">Формат: 123-456-789 01 (11 цифр)</div>
+                    </div>
+                </div>
+
+                <!-- Блок: Услуга -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-hand-holding-heart"></i>
+                        <h5>Информация об услуге</h5>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label required-field">Тип услуги</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-tag"></i>
+                            {{ form.service_type }}
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label required-field">Описание заявки</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-pen"></i>
+                            {{ form.description }}
+                        </div>
+                        <div class="form-hint">Опишите подробно вашу ситуацию. Укажите все важные детали</div>
+                    </div>
+                </div>
+
+                <!-- Блок: Загрузка документов -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h5>Прикрепление документов</h5>
+                        <span class="optional-badge">Необязательно</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="upload-card" data-doc-type="passport">
+                                <div class="upload-icon">
+                                    <i class="fas fa-passport"></i>
+                                </div>
+                                <div class="upload-title">Скан паспорта</div>
+                                <div class="upload-area">
+                                    {{ form.passport_scan }}
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Нажмите или перетащите файл</p>
+                                        <span>PDF, JPG, PNG до 5MB</span>
+                                    </div>
+                                    <div class="upload-preview" style="display: none;">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span class="file-name"></span>
+                                        <button type="button" class="remove-file"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="upload-card" data-doc-type="snils">
+                                <div class="upload-icon">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+                                <div class="upload-title">Скан СНИЛС</div>
+                                <div class="upload-area">
+                                    {{ form.snils_scan }}
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Нажмите или перетащите файл</p>
+                                        <span>PDF, JPG, PNG до 5MB</span>
+                                    </div>
+                                    <div class="upload-preview" style="display: none;">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span class="file-name"></span>
+                                        <button type="button" class="remove-file"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="upload-card" data-doc-type="additional">
+                                <div class="upload-icon">
+                                    <i class="fas fa-paperclip"></i>
+                                </div>
+                                <div class="upload-title">Дополнительные документы</div>
+                                <div class="upload-area">
+                                    {{ form.additional_docs }}
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Нажмите или перетащите файл</p>
+                                        <span>PDF, JPG, PNG до 5MB</span>
+                                    </div>
+                                    <div class="upload-preview" style="display: none;">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span class="file-name"></span>
+                                        <button type="button" class="remove-file"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="upload-note">
+                        <i class="fas fa-info-circle"></i>
+                        <small>Вы можете прикрепить до 5 файлов. Максимальный размер каждого файла — 5 МБ. Поддерживаемые форматы: PDF, JPG, PNG</small>
+                    </div>
+                </div>
+
+                <!-- Блок: Согласие -->
+                <div class="consent-section">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="agreeCheck" required>
+                        <label class="form-check-label" for="agreeCheck">
+                            Я подтверждаю достоверность предоставленных данных и даю согласие на их обработку
+                        </label>
+                    </div>
+                    <div class="consent-text">
+                        <small>Нажимая кнопку "Отправить заявление", вы подтверждаете, что ознакомлены с <a href="#">Политикой обработки персональных данных</a></small>
+                    </div>
+                </div>
+
+                <!-- Кнопки действий -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary-custom">
+                        <i class="fas fa-paper-plane me-2"></i> Отправить заявление
+                    </button>
+                    <button type="reset" class="btn-outline-custom">
+                        <i class="fas fa-eraser me-2"></i> Очистить форму
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Управление загрузкой файлов
+    document.querySelectorAll('.upload-card').forEach(card => {
+        const fileInput = card.querySelector('input[type="file"]');
+        const placeholder = card.querySelector('.upload-placeholder');
+        const preview = card.querySelector('.upload-preview');
+        const fileNameSpan = preview?.querySelector('.file-name');
+        const removeBtn = preview?.querySelector('.remove-file');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    const fileName = file.name;
+                    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+
+                    if (placeholder) placeholder.style.display = 'none';
+                    if (preview) {
+                        preview.style.display = 'flex';
+                        if (fileNameSpan) fileNameSpan.textContent = `${fileName} (${fileSize} MB)`;
+                    }
+
+                    const icon = preview?.querySelector('i');
+                    if (icon) {
+                        if (file.type === 'application/pdf') {
+                            icon.className = 'fas fa-file-pdf';
+                        } else if (file.type.includes('image')) {
+                            icon.className = 'fas fa-file-image';
+                        } else {
+                            icon.className = 'fas fa-file-alt';
+                        }
+                    }
+                }
+            });
+
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fileInput.value = '';
+                    if (placeholder) placeholder.style.display = 'block';
+                    if (preview) preview.style.display = 'none';
+                });
+            }
+
+            const uploadArea = card.querySelector('.upload-area');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('drag-over');
+                });
+
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('drag-over');
+                });
+
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('drag-over');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        fileInput.files = files;
+                        const event = new Event('change', { bubbles: true });
+                        fileInput.dispatchEvent(event);
+                    }
+                });
+            }
+        }
+    });
+
+    // Валидация СНИЛС
+    const snilsInput = document.querySelector('input[name="snils"]');
+    if (snilsInput) {
+        snilsInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+
+            let formatted = '';
+            if (value.length > 0) {
+                formatted = value.slice(0, 3);
+                if (value.length > 3) formatted += '-' + value.slice(3, 6);
+                if (value.length > 6) formatted += '-' + value.slice(6, 9);
+                if (value.length > 9) formatted += ' ' + value.slice(9, 11);
+            }
+            this.value = formatted;
+        });
+    }
+
+    // Валидация перед отправкой
+    const form = document.getElementById('applicationForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#dc3545';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#e2e8f0';
+                }
+            });
+
+            const agreeCheck = document.getElementById('agreeCheck');
+            if (agreeCheck && !agreeCheck.checked) {
+                isValid = false;
+                alert('Пожалуйста, подтвердите согласие на обработку персональных данных');
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Пожалуйста, заполните все обязательные поля');
+            }
+        });
+    }
+</script>
+{% endblock %}
