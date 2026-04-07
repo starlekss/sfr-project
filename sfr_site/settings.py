@@ -52,15 +52,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sfr_site.wsgi.application'
 
-# ========================================
-# БАЗА ДАННЫХ
-# ========================================
-
-# Проверяем, есть ли DATABASE_URL (на Render)
+# База данных
 database_url = os.environ.get('DATABASE_URL')
 
 if database_url:
-    # На Render используем PostgreSQL
     DATABASES = {
         'default': dj_database_url.config(
             default=database_url,
@@ -69,7 +64,6 @@ if database_url:
         )
     }
 else:
-    # Локально используем SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -89,7 +83,6 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
 
-# Статические файлы
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
