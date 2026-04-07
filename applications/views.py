@@ -219,3 +219,6 @@ def create_admin(request):
         return JsonResponse({'status': 'Admin created!', 'username': 'Zubkova', 'password': '1234'})
     return JsonResponse({'status': 'Admin already exists'})
 
+def privacy_policy(request):
+    """Страница с политикой обработки персональных данных"""
+    return render(request, 'applications/privacy_policy.html')
