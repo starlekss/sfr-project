@@ -4,14 +4,14 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="fas fa-list me-2" style="color: var(--sfr-blue);"></i>Список заявок</h2>
     <div>
-        <a href="{% url 'report_form' %}" class="btn btn-success me-2" style="background: #28a745; color: white;">
+        <a href="{% url 'report_form' %}" class="btn-report">
             <i class="fas fa-chart-line me-1"></i> Отчет за месяц
         </a>
-        <a href="{% url 'analytics_dashboard' %}" class="btn btn-info me-2" style="background: #17a2b8; color: white;">
-            <i class="fas fa-chart-line me-1"></i> Аналитика
+        <a href="{% url 'analytics_dashboard' %}" class="btn-analytics">
+            <i class="fas fa-chart-pie me-1"></i> Аналитика
         </a>
         <span class="badge bg-primary me-2">Всего: {{ page_obj.paginator.count }}</span>
-        <a href="{% url 'operator_logout' %}" class="btn btn-outline-custom btn-sm">
+        <a href="{% url 'operator_logout' %}" class="btn-outline-custom btn-sm">
             <i class="fas fa-sign-out-alt me-1"></i> Выход
         </a>
     </div>
@@ -102,26 +102,73 @@
 {% endif %}
 
 <style>
-    .btn-info {
-        background: #17a2b8;
-        color: white;
+    /* Стили для кнопок в едином стиле */
+    .btn-report {
+        display: inline-block;
+        background: linear-gradient(135deg, #28a745, #1e7e34);
         border: none;
+        padding: 6px 15px;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 14px;
         transition: all 0.3s;
+        color: white;
+        text-decoration: none;
+        margin-right: 8px;
     }
-    .btn-info:hover {
-        background: #138496;
+
+    .btn-report:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+        color: white;
+    }
+
+    .btn-analytics {
+        display: inline-block;
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        border: none;
+        padding: 6px 15px;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s;
+        color: white;
+        text-decoration: none;
+        margin-right: 8px;
+    }
+
+    .btn-analytics:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(23,162,184,0.3);
+        color: white;
+    }
+
+    .btn-outline-custom {
+        border: 2px solid var(--sfr-blue);
+        background: transparent;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 13px;
+        color: var(--sfr-blue);
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-outline-custom:hover {
+        background: var(--sfr-blue);
+        color: white;
         transform: translateY(-2px);
     }
-    .btn-success {
-        background: #28a745;
-        color: white;
-        border: none;
-        transition: all 0.3s;
+
+    .badge.bg-primary {
+        background: var(--sfr-blue) !important;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 13px;
     }
-    .btn-success:hover {
-        background: #1e7e34;
-        transform: translateY(-2px);
-    }
+
     .status-badge {
         display: inline-block;
         padding: 4px 12px;
@@ -133,5 +180,24 @@
     .status-processing { background: #fef3c7; color: #d97706; }
     .status-completed { background: #d1fae5; color: #059669; }
     .status-rejected { background: #fee2e2; color: #dc2626; }
+
+    /* Адаптация для мобильных */
+    @media (max-width: 768px) {
+        .d-flex {
+            flex-direction: column;
+            gap: 15px;
+            align-items: stretch !important;
+        }
+        .d-flex > div {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-report, .btn-analytics, .btn-outline-custom {
+            font-size: 12px;
+            padding: 5px 12px;
+        }
+    }
 </style>
 {% endblock %}
