@@ -993,6 +993,7 @@
            МОБИЛЬНАЯ АДАПТАЦИЯ
         ======================================== */
 
+        /* Планшеты и телефоны */
         @media (max-width: 768px) {
             .stat-number {
                 font-size: 32px;
@@ -1000,26 +1001,50 @@
             .stat-label {
                 font-size: 11px;
             }
+
+            /* Быстрые действия */
+            .quick-actions {
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 16px;
+            }
+
+            .quick-actions-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+
             .action-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+                gap: 10px;
             }
+
             .action-card {
-                padding: 15px 10px;
+                padding: 12px 8px;
+                border-radius: 12px;
             }
+
             .action-icon {
                 width: 45px;
                 height: 45px;
+                margin-bottom: 8px;
             }
+
             .action-icon i {
                 font-size: 20px;
             }
+
             .action-title {
-                font-size: 13px;
+                font-size: 12px;
+                margin-bottom: 4px;
             }
+
             .action-desc {
-                font-size: 10px;
+                font-size: 9px;
+                line-height: 1.2;
             }
+
+            /* Форма */
             .form-card {
                 padding: 20px;
                 margin: 0 10px;
@@ -1043,9 +1068,13 @@
                 font-size: 13px;
                 padding: 10px 12px;
             }
+
+            /* Карточки загрузки */
             .upload-card {
                 margin-bottom: 15px;
             }
+
+            /* Кнопки */
             .btn-primary-custom, .btn-outline-custom, .btn-gold-custom {
                 padding: 10px 20px;
                 font-size: 14px;
@@ -1058,6 +1087,8 @@
             .form-actions .btn-outline-custom {
                 width: 100%;
             }
+
+            /* Таблицы */
             .applications-table,
             .table {
                 font-size: 12px;
@@ -1068,21 +1099,56 @@
             .table td {
                 padding: 8px 10px;
             }
+
+            /* Карта */
+            #map-container, .map-container {
+                height: 250px !important;
+                border-radius: 12px;
+                margin-top: 15px;
+            }
+
             .offices-list {
-                margin-bottom: 20px;
+                max-height: 200px;
+                overflow-y: auto;
+                margin-bottom: 15px;
             }
+
             .office-card {
-                padding: 12px;
+                padding: 10px 12px;
+                margin-bottom: 8px;
+                border-radius: 10px;
             }
+
             .office-name {
-                font-size: 14px;
+                font-size: 13px;
+                font-weight: 600;
+                margin-bottom: 4px;
             }
+
             .office-address, .office-hours, .office-phone {
-                font-size: 11px;
+                font-size: 10px;
             }
-            .map-container {
-                height: 250px;
+
+            .office-address i, .office-hours i, .office-phone i {
+                width: 14px;
+                font-size: 10px;
             }
+
+            /* Изменение порядка: список сверху, карта снизу */
+            .map-section .row {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .map-section .col-md-5 {
+                order: 1;
+            }
+
+            .map-section .col-md-7 {
+                order: 2;
+            }
+
+            /* Калькулятор */
             .calculator-card {
                 padding: 15px;
             }
@@ -1092,6 +1158,8 @@
             .calculator-result .amount {
                 font-size: 24px;
             }
+
+            /* Чат-бот */
             .chat-window {
                 width: 280px;
                 right: -15px;
@@ -1104,6 +1172,8 @@
                 font-size: 10px;
                 padding: 4px 8px;
             }
+
+            /* Футер */
             .footer {
                 text-align: center;
                 padding: 30px 0 20px;
@@ -1116,6 +1186,8 @@
             .footer .col-md-2 {
                 margin-bottom: 20px;
             }
+
+            /* Хедер */
             .main-header .row {
                 flex-direction: column;
                 text-align: center;
@@ -1134,6 +1206,8 @@
                 display: inline-block;
                 margin-top: 5px;
             }
+
+            /* Верхняя панель */
             .top-bar .row {
                 flex-direction: column;
                 text-align: center;
@@ -1143,6 +1217,8 @@
                 width: 100%;
                 text-align: center;
             }
+
+            /* Навигация */
             .nav {
                 flex-wrap: wrap;
                 justify-content: center;
@@ -1154,12 +1230,16 @@
                 padding: 8px 12px;
                 font-size: 13px;
             }
+
+            /* Статистика */
             .stats-section .row {
                 flex-direction: column;
             }
             .stat-card {
                 margin-bottom: 20px;
             }
+
+            /* Улучшение таргетинга */
             button,
             .btn,
             .action-card,
@@ -1179,13 +1259,35 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .stat-number {
-                font-size: 28px;
-            }
+        /* Супер-маленькие телефоны (до 400px) */
+        @media (max-width: 400px) {
             .action-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
             }
+
+            .action-card {
+                padding: 10px 5px;
+            }
+
+            .action-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .action-icon i {
+                font-size: 18px;
+            }
+
+            .action-title {
+                font-size: 11px;
+            }
+
+            .action-desc {
+                font-size: 8px;
+                display: none;
+            }
+
             .form-card {
                 padding: 15px;
                 margin: 0 5px;
@@ -1204,12 +1306,15 @@
                 padding: 6px 10px;
                 font-size: 11px;
             }
+
+            /* Скрываем 4-ю колонку в таблицах */
             .applications-table th:nth-child(4),
             .applications-table td:nth-child(4),
             .table th:nth-child(4),
             .table td:nth-child(4) {
                 display: none;
             }
+
             .chat-window {
                 width: 260px;
                 right: -20px;
@@ -1223,6 +1328,7 @@
             }
         }
 
+        /* Планшеты (между 769px и 992px) */
         @media (min-width: 769px) and (max-width: 992px) {
             .action-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -1234,7 +1340,7 @@
                 font-size: 36px;
             }
             .map-container {
-                height: 350px;
+                height: 350px !important;
             }
         }
     </style>
@@ -1476,7 +1582,7 @@
     </div>
 </section>
 
-<section id="map" class="container mb-5">
+<section id="map" class="container mb-5 map-section">
     <h3 class="mb-4">Отделения Социального фонда России в Самарской области</h3>
     <div class="row">
         <div class="col-md-5">
