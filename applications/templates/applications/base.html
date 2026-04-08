@@ -73,6 +73,18 @@
             z-index: 1000;
         }
 
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 55px;
+            width: auto;
+            transition: all 0.3s ease;
+        }
+
         .logo h1 {
             font-size: 24px;
             font-weight: 700;
@@ -993,6 +1005,37 @@
            МОБИЛЬНАЯ АДАПТАЦИЯ
         ======================================== */
 
+        /* Логотип в хедере */
+        @media (max-width: 768px) {
+            .logo img {
+                height: 45px;
+            }
+
+            .logo h1 {
+                font-size: 18px;
+            }
+
+            .logo p {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+            }
+
+            .logo img {
+                height: 40px;
+            }
+
+            .logo h1 {
+                font-size: 16px;
+            }
+        }
+
         /* Планшеты и телефоны */
         @media (max-width: 768px) {
             .stat-number {
@@ -1114,7 +1157,6 @@
                 padding-right: 5px;
             }
 
-            /* Стили для прокрутки */
             .offices-list::-webkit-scrollbar {
                 width: 3px;
             }
@@ -1129,7 +1171,6 @@
                 border-radius: 3px;
             }
 
-            /* Карточки отделений - ровный текст */
             .office-card {
                 text-align: left;
                 padding: 12px 15px;
@@ -1179,7 +1220,6 @@
                 word-break: break-word;
             }
 
-            /* Изменение порядка: список сверху, карта снизу */
             .map-section .row {
                 display: flex;
                 flex-direction: column;
@@ -1193,7 +1233,6 @@
                 order: 2;
             }
 
-            /* Калькулятор */
             .calculator-card {
                 padding: 15px;
             }
@@ -1204,7 +1243,6 @@
                 font-size: 24px;
             }
 
-            /* Чат-бот */
             .chat-window {
                 width: 280px;
                 right: -15px;
@@ -1218,7 +1256,6 @@
                 padding: 4px 8px;
             }
 
-            /* Футер */
             .footer {
                 text-align: center;
                 padding: 30px 0 20px;
@@ -1232,7 +1269,6 @@
                 margin-bottom: 20px;
             }
 
-            /* Хедер */
             .main-header .row {
                 flex-direction: column;
                 text-align: center;
@@ -1241,18 +1277,11 @@
                 justify-content: center;
                 margin-bottom: 10px;
             }
-            .logo h1 {
-                font-size: 18px;
-            }
-            .logo p {
-                font-size: 10px;
-            }
             .gov-badge {
                 display: inline-block;
                 margin-top: 5px;
             }
 
-            /* Верхняя панель */
             .top-bar .row {
                 flex-direction: column;
                 text-align: center;
@@ -1263,7 +1292,6 @@
                 text-align: center;
             }
 
-            /* Навигация */
             .nav {
                 flex-wrap: wrap;
                 justify-content: center;
@@ -1276,7 +1304,6 @@
                 font-size: 13px;
             }
 
-            /* Статистика */
             .stats-section .row {
                 flex-direction: column;
             }
@@ -1284,7 +1311,6 @@
                 margin-bottom: 20px;
             }
 
-            /* Улучшение таргетинга */
             button,
             .btn,
             .action-card,
@@ -1352,7 +1378,6 @@
                 font-size: 11px;
             }
 
-            /* Карточки отделений для супер-маленьких */
             .office-card {
                 padding: 10px 12px;
             }
@@ -1377,7 +1402,6 @@
                 font-size: 11px;
             }
 
-            /* Скрываем 4-ю колонку в таблицах */
             .applications-table th:nth-child(4),
             .applications-table td:nth-child(4),
             .table th:nth-child(4),
@@ -1413,7 +1437,6 @@
                 height: 350px !important;
             }
 
-            /* Карточки отделений для планшетов */
             .office-card {
                 padding: 12px 15px;
             }

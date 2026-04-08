@@ -3,16 +3,16 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="fas fa-list me-2" style="color: var(--sfr-blue);"></i>Список заявок</h2>
-    <div>
+    <div class="button-group">
         <a href="{% url 'report_form' %}" class="btn-report">
-            <i class="fas fa-chart-line me-1"></i> Отчет за месяц
+            <i class="fas fa-chart-line me-1"></i> <span>Отчет за месяц</span>
         </a>
         <a href="{% url 'analytics_dashboard' %}" class="btn-analytics">
-            <i class="fas fa-chart-pie me-1"></i> Аналитика
+            <i class="fas fa-chart-pie me-1"></i> <span>Аналитика</span>
         </a>
-        <span class="badge bg-primary me-2">Всего: {{ page_obj.paginator.count }}</span>
+        <span class="badge bg-primary">Всего: {{ page_obj.paginator.count }}</span>
         <a href="{% url 'operator_logout' %}" class="btn-outline-custom btn-sm">
-            <i class="fas fa-sign-out-alt me-1"></i> Выход
+            <i class="fas fa-sign-out-alt me-1"></i> <span>Выход</span>
         </a>
     </div>
 </div>
@@ -102,7 +102,7 @@
 {% endif %}
 
 <style>
-    /* Стили для кнопок в едином стиле */
+    /* Кнопки в едином стиле */
     .btn-report {
         display: inline-block;
         background: linear-gradient(135deg, #28a745, #1e7e34);
@@ -181,22 +181,64 @@
     .status-completed { background: #d1fae5; color: #059669; }
     .status-rejected { background: #fee2e2; color: #dc2626; }
 
-    /* Адаптация для мобильных */
+    /* Мобильная адаптация */
     @media (max-width: 768px) {
-        .d-flex {
-            flex-direction: column;
-            gap: 15px;
-            align-items: stretch !important;
-        }
-        .d-flex > div {
+        .button-group {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 8px;
+            width: 100%;
         }
-        .btn-report, .btn-analytics, .btn-outline-custom {
+
+        .btn-report, .btn-analytics {
+            padding: 6px 12px;
             font-size: 12px;
-            padding: 5px 12px;
+            margin-right: 0;
+        }
+
+        .btn-outline-custom {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .badge.bg-primary {
+            font-size: 11px;
+            padding: 5px 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .button-group {
+            gap: 6px;
+        }
+
+        .btn-report, .btn-analytics {
+            flex: 1;
+            min-width: calc(50% - 3px);
+            text-align: center;
+            font-size: 11px;
+            padding: 6px 8px;
+        }
+
+        .btn-report span, .btn-analytics span {
+            display: inline;
+        }
+
+        .btn-outline-custom {
+            font-size: 11px;
+            padding: 5px 8px;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .btn-report, .btn-analytics {
+            min-width: 100%;
+        }
+
+        .btn-outline-custom {
+            width: 100%;
+            text-align: center;
         }
     }
 </style>
