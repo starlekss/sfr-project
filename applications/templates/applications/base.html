@@ -1100,7 +1100,7 @@
                 padding: 8px 10px;
             }
 
-            /* Карта */
+            /* Карта - общие стили */
             #map-container, .map-container {
                 height: 250px !important;
                 border-radius: 12px;
@@ -1108,30 +1108,75 @@
             }
 
             .offices-list {
-                max-height: 200px;
+                max-height: 300px;
                 overflow-y: auto;
                 margin-bottom: 15px;
+                padding-right: 5px;
             }
 
+            /* Стили для прокрутки */
+            .offices-list::-webkit-scrollbar {
+                width: 3px;
+            }
+
+            .offices-list::-webkit-scrollbar-track {
+                background: #e2e8f0;
+                border-radius: 3px;
+            }
+
+            .offices-list::-webkit-scrollbar-thumb {
+                background: var(--sfr-blue);
+                border-radius: 3px;
+            }
+
+            /* Карточки отделений - ровный текст */
             .office-card {
-                padding: 10px 12px;
-                margin-bottom: 8px;
-                border-radius: 10px;
+                text-align: left;
+                padding: 12px 15px;
+                margin-bottom: 10px;
+                background: var(--white);
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
             }
 
             .office-name {
-                font-size: 13px;
-                font-weight: 600;
-                margin-bottom: 4px;
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--sfr-blue);
+                margin-bottom: 8px;
+                display: block;
+                text-align: left;
             }
 
-            .office-address, .office-hours, .office-phone {
-                font-size: 10px;
+            .office-address,
+            .office-hours,
+            .office-phone {
+                display: flex;
+                align-items: flex-start;
+                gap: 8px;
+                margin-bottom: 6px;
+                font-size: 12px;
+                line-height: 1.4;
+                color: var(--sfr-gray-dark);
+                text-align: left;
             }
 
-            .office-address i, .office-hours i, .office-phone i {
-                width: 14px;
-                font-size: 10px;
+            .office-address i,
+            .office-hours i,
+            .office-phone i {
+                width: 16px;
+                margin-top: 2px;
+                flex-shrink: 0;
+                color: var(--sfr-blue);
+                font-size: 12px;
+            }
+
+            .office-address span,
+            .office-hours span,
+            .office-phone span {
+                flex: 1;
+                text-align: left;
+                word-break: break-word;
             }
 
             /* Изменение порядка: список сверху, карта снизу */
@@ -1307,6 +1352,31 @@
                 font-size: 11px;
             }
 
+            /* Карточки отделений для супер-маленьких */
+            .office-card {
+                padding: 10px 12px;
+            }
+
+            .office-name {
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            .office-address,
+            .office-hours,
+            .office-phone {
+                font-size: 11px;
+                gap: 6px;
+                margin-bottom: 5px;
+            }
+
+            .office-address i,
+            .office-hours i,
+            .office-phone i {
+                width: 14px;
+                font-size: 11px;
+            }
+
             /* Скрываем 4-ю колонку в таблицах */
             .applications-table th:nth-child(4),
             .applications-table td:nth-child(4),
@@ -1341,6 +1411,21 @@
             }
             .map-container {
                 height: 350px !important;
+            }
+
+            /* Карточки отделений для планшетов */
+            .office-card {
+                padding: 12px 15px;
+            }
+
+            .office-name {
+                font-size: 14px;
+            }
+
+            .office-address,
+            .office-hours,
+            .office-phone {
+                font-size: 11px;
             }
         }
     </style>
@@ -1589,18 +1674,36 @@
             <div class="offices-list">
                 <div class="office-card" data-lat="53.195878" data-lng="50.100202">
                     <div class="office-name">Отделение СФР по Самарской области</div>
-                    <div class="office-address"><i class="fas fa-map-marker-alt me-2"></i>г. Самара, ул. Садовая, 175</div>
-                    <div class="office-hours"><i class="fas fa-clock me-2"></i>Пн-Пт: 9:00-18:00</div>
+                    <div class="office-address">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>г. Самара, ул. Садовая, 175</span>
+                    </div>
+                    <div class="office-hours">
+                        <i class="fas fa-clock"></i>
+                        <span>Пн-Пт: 9:00-18:00</span>
+                    </div>
                 </div>
                 <div class="office-card" data-lat="53.203156" data-lng="50.155952">
                     <div class="office-name">Клиентская служба Ленинского района</div>
-                    <div class="office-address"><i class="fas fa-map-marker-alt me-2"></i>г. Самара, ул. Куйбышева, 111</div>
-                    <div class="office-hours"><i class="fas fa-clock me-2"></i>Пн-Пт: 9:00-18:00, Сб: 10:00-15:00</div>
+                    <div class="office-address">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>г. Самара, ул. Куйбышева, 111</span>
+                    </div>
+                    <div class="office-hours">
+                        <i class="fas fa-clock"></i>
+                        <span>Пн-Пт: 9:00-18:00, Сб: 10:00-15:00</span>
+                    </div>
                 </div>
                 <div class="office-card" data-lat="53.524710" data-lng="49.415125">
                     <div class="office-name">Клиентская служба г. Тольятти</div>
-                    <div class="office-address"><i class="fas fa-map-marker-alt me-2"></i>г. Тольятти, ул. Ленина, 18</div>
-                    <div class="office-hours"><i class="fas fa-clock me-2"></i>Пн-Пт: 9:00-18:00, Сб: 10:00-14:00</div>
+                    <div class="office-address">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>г. Тольятти, ул. Ленина, 18</span>
+                    </div>
+                    <div class="office-hours">
+                        <i class="fas fa-clock"></i>
+                        <span>Пн-Пт: 9:00-18:00, Сб: 10:00-14:00</span>
+                    </div>
                 </div>
             </div>
         </div>
