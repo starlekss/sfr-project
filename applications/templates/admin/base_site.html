@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+
+{% block title %}СФР - Панель управления{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">СФР - Панель управления</a></h1>
+{% endblock %}
+
+{% block nav-global %}
+<div style="background: #f8f9fa; padding: 10px 15px; border-bottom: 1px solid #e2e8f0;">
+    <a href="{% url 'admin:index' %}" style="margin-right: 20px;">🏠 Главная</a>
+    <a href="{% url 'analytics_dashboard' %}" style="margin-right: 20px; font-weight: bold; color: #0054a6;">📊 Аналитика</a>
+    <a href="{% url 'admin:applications_socialapplication_changelist' %}">📋 Заявки</a>
+</div>
+{% endblock %}

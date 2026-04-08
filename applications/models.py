@@ -96,3 +96,22 @@ class ApplicationHistory(models.Model):
 
     def __str__(self):
         return f"{self.created_at} - {self.operator} - {self.action}"
+
+
+class Citizen(models.Model):
+    """Модель гражданина для личного кабинета"""
+    snils = models.CharField(max_length=14, unique=True, verbose_name="СНИЛС")
+    last_name = models.CharField(max_length=100, verbose_name="Фамилия")
+    first_name = models.CharField(max_length=100, verbose_name="Имя")
+    patronymic = models.CharField(max_length=100, blank=True, verbose_name="Отчество")
+    email = models.EmailField(verbose_name="Email")
+    phone = models.CharField(max_length=20, verbose_name="Телефон")
+    password = models.CharField(max_length=255, verbose_name="Пароль")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата регистрации")
+
+    def __str__(self):
+        return f"{self.last_name} {self.first_name} ({self.snils})"
+
+    class Meta:
+        verbose_name = "Гражданин"
+        verbose_name_plural = "Граждане"

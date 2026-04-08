@@ -1,0 +1,302 @@
+{% extends 'applications/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-chart-line me-2"></i>Панель аналитики</h2>
+        <div>
+            <span class="badge bg-primary">Обновлено: {% now "d.m.Y H:i" %}</span>
+            {% if user.is_staff %}
+            <a href="{% url 'operator_logout' %}" class="btn btn-outline-secondary btn-sm ms-2">
+                <i class="fas fa-sign-out-alt"></i> Выйти
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- KPI Карточки -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Всего заявок</h6>
+                            <h2 class="mb-0">{{ total_applications }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-file-alt fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Новые</h6>
+                            <h2 class="mb-0">{{ new_applications }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-bell fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">В обработке</h6>
+                            <h2 class="mb-0">{{ processing_applications }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-spinner fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Выполнено</h6>
+                            <h2 class="mb-0">{{ completed_applications }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Дополнительные KPI -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-times-circle fa-2x text-danger"></i>
+                    <h3 class="mt-2">{{ rejected_applications }}</h3>
+                    <p class="text-muted mb-0">Отказано</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-2x text-primary"></i>
+                    <h3 class="mt-2">{{ completion_rate }}%</h3>
+                    <p class="text-muted mb-0">Процент выполнения</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x text-info"></i>
+                    <h3 class="mt-2">{{ total_applications }}</h3>
+                    <p class="text-muted mb-0">Всего обращений</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Графики -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Распределение по статусам</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Динамика заявок (30 дней)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailyChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Популярные услуги</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="servicesChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Статистика по месяцам</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Последние заявки -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Последние заявки</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>№</th>
+                            <th>ФИО</th>
+                            <th>Тип услуги</th>
+                            <th>Статус</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in recent_applications %}
+                        <tr>
+                            <td><strong>#{{ app.id }}</strong></td>
+                            <td>{{ app.last_name }} {{ app.first_name }} {{ app.patronymic }}</td>
+                            <td>{{ app.service_type|truncatechars:30 }}</td>
+                            <td>
+                                <span class="badge
+                                    {% if app.status == 'new' %}bg-secondary
+                                    {% elif app.status == 'processing' %}bg-warning
+                                    {% elif app.status == 'completed' %}bg-success
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ app.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ app.created_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">Нет заявок</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Статусная диаграмма (круговая)
+    const statusData = {{ status_data|safe }};
+    if (statusData.labels && statusData.labels.length > 0) {
+        const ctx1 = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                labels: statusData.labels,
+                datasets: [{
+                    data: statusData.counts,
+                    backgroundColor: ['#6c757d', '#ffc107', '#28a745', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    }
+
+    // Динамика заявок (линейный график)
+    const dailyData = {{ daily_data|safe }};
+    if (dailyData.labels && dailyData.labels.length > 0) {
+        const ctx2 = document.getElementById('dailyChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: dailyData.labels,
+                datasets: [{
+                    label: 'Количество заявок',
+                    data: dailyData.counts,
+                    borderColor: '#0054a6',
+                    backgroundColor: 'rgba(0,84,166,0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#0054a6'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true
+            }
+        });
+    }
+
+    // Популярные услуги (горизонтальная диаграмма)
+    const servicesData = {{ services_data|safe }};
+    if (servicesData.labels && servicesData.labels.length > 0) {
+        const ctx3 = document.getElementById('servicesChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: servicesData.labels,
+                datasets: [{
+                    label: 'Количество заявок',
+                    data: servicesData.counts,
+                    backgroundColor: '#c6a23b',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                indexAxis: 'y'
+            }
+        });
+    }
+
+    // Статистика по месяцам
+    const monthlyData = {{ monthly_chart|safe }};
+    if (monthlyData.labels && monthlyData.labels.length > 0) {
+        const ctx4 = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: monthlyData.labels,
+                datasets: [{
+                    label: 'Заявок',
+                    data: monthlyData.counts,
+                    backgroundColor: '#0054a6',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true
+            }
+        });
+    }
+</script>
+{% endblock %}

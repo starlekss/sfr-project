@@ -5,16 +5,21 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import FileResponse, JsonResponse
 from django.core.files.uploadedfile import UploadedFile
-from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView
-from django.contrib.auth.forms import AuthenticationForm
-from .models import SocialApplication, Operator
-from .forms import SocialApplicationForm, UserRegistrationForm, UserProfileForm
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import get_user_model
+from .models import SocialApplication, Operator, Citizen
+from .forms import SocialApplicationForm
 from loguru import logger
 import requests
 import traceback
 import os
+from django.db.models import Count
+from django.db.models.functions import TruncDate, TruncMonth
+from datetime import datetime, timedelta
+from django.utils import timezone
+import json
+
+User = get_user_model()
 
 
 def upload_to_fastapi(file, doc_type: str):
@@ -23,7 +28,6 @@ def upload_to_fastapi(file, doc_type: str):
         if not file:
             return None
 
-        # Сбрасываем указатель файла в начало
         file.seek(0)
 
         url = f"http://127.0.0.1:8001/upload/{doc_type}"
@@ -50,16 +54,13 @@ def index(request):
     if request.method == 'POST':
         form = SocialApplicationForm(request.POST, request.FILES)
 
-        # Логируем полученные файлы
         logger.info(f"Получены файлы: {list(request.FILES.keys())}")
 
         if form.is_valid():
             try:
-                # Сохраняем заявку
                 application = form.save()
                 logger.info(f"Заявка #{application.id} успешно сохранена в БД")
 
-                # Загрузка файлов в FastAPI (опционально, не блокирует создание заявки)
                 if request.FILES.get('passport_scan'):
                     upload_to_fastapi(request.FILES['passport_scan'], 'passport')
 
@@ -80,7 +81,6 @@ def index(request):
                 logger.error(traceback.format_exc())
                 messages.error(request, f'❌ Ошибка при создании заявки: {str(e)}')
         else:
-            # Выводим ошибки формы
             for field, errors in form.errors.items():
                 for error in errors:
                     logger.error(f"Ошибка в поле {field}: {error}")
@@ -102,7 +102,6 @@ def search_application(request):
     query = request.GET.get('query')
     app_id = request.GET.get('app_id')
 
-    # Поиск по номеру заявки
     if app_id:
         try:
             app = SocialApplication.objects.get(id=app_id)
@@ -111,7 +110,6 @@ def search_application(request):
             messages.error(request, 'Заявка с таким номером не найдена')
             return render(request, 'applications/search.html')
 
-    # Поиск по СНИЛС
     if query:
         applications = SocialApplication.objects.filter(snils=query).order_by('-created_at')
         if applications.exists():
@@ -207,10 +205,6 @@ def download_pdf(request, app_id):
 
     return redirect('application_detail', app_id=app_id)
 
-from django.contrib.auth import get_user_model
-from django.http import JsonResponse
-
-User = get_user_model()
 
 def create_admin(request):
     """Временный эндпоинт для создания администратора"""
@@ -223,85 +217,187 @@ def create_admin(request):
         return JsonResponse({'status': 'Admin created!', 'username': 'Zubkova', 'password': '1234'})
     return JsonResponse({'status': 'Admin already exists'})
 
+
 def privacy_policy(request):
     """Страница с политикой обработки персональных данных"""
     return render(request, 'applications/privacy_policy.html')
 
 
-class UserRegistrationView(CreateView):
-    """Регистрация пользователя"""
-    form_class = UserRegistrationForm
-    template_name = 'applications/register.html'
-    success_url = reverse_lazy('user_login')
+def citizen_login(request):
+    """Вход гражданина в личный кабинет"""
+    if request.method == 'POST':
+        snils = request.POST.get('snils')
+        password = request.POST.get('password')
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        user = form.save()
-        auth_login(self.request, user)
-        messages.success(self.request, f'Добро пожаловать, {user.username}!')
-        return response
+        try:
+            citizen = Citizen.objects.get(snils=snils)
+            if check_password(password, citizen.password):
+                request.session['citizen_id'] = citizen.id
+                request.session['citizen_name'] = f"{citizen.last_name} {citizen.first_name}"
+                messages.success(request, f'Добро пожаловать, {citizen.first_name}!')
+                return redirect('citizen_cabinet')
+            else:
+                messages.error(request, 'Неверный пароль')
+        except Citizen.DoesNotExist:
+            messages.error(request, 'Пользователь с таким СНИЛС не найден')
 
-
-class UserLoginView(LoginView):
-    """Вход пользователя"""
-    template_name = 'applications/user_login.html'
-    authentication_form = AuthenticationForm
-    redirect_authenticated_user = True
-
-    def get_success_url(self):
-        return reverse_lazy('user_profile')
+    return render(request, 'applications/citizen_login.html')
 
 
-def user_logout(request):
-    """Выход пользователя"""
-    logout(request)
-    messages.success(request, 'Вы вышли из системы')
+def citizen_register(request):
+    """Регистрация гражданина"""
+    if request.method == 'POST':
+        snils = request.POST.get('snils')
+        last_name = request.POST.get('last_name')
+        first_name = request.POST.get('first_name')
+        patronymic = request.POST.get('patronymic', '')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        password = request.POST.get('password')
+        password_confirm = request.POST.get('password_confirm')
+
+        if password != password_confirm:
+            messages.error(request, 'Пароли не совпадают')
+            return render(request, 'applications/citizen_register.html')
+
+        if Citizen.objects.filter(snils=snils).exists():
+            messages.error(request, 'Пользователь с таким СНИЛС уже зарегистрирован')
+            return render(request, 'applications/citizen_register.html')
+
+        if Citizen.objects.filter(email=email).exists():
+            messages.error(request, 'Пользователь с таким email уже зарегистрирован')
+            return render(request, 'applications/citizen_register.html')
+
+        citizen = Citizen.objects.create(
+            snils=snils,
+            last_name=last_name,
+            first_name=first_name,
+            patronymic=patronymic,
+            email=email,
+            phone=phone,
+            password=make_password(password)
+        )
+
+        request.session['citizen_id'] = citizen.id
+        request.session['citizen_name'] = f"{citizen.last_name} {citizen.first_name}"
+
+        messages.success(request, f'Регистрация прошла успешно! Добро пожаловать, {citizen.first_name}!')
+        return redirect('citizen_cabinet')
+
+    return render(request, 'applications/citizen_register.html')
+
+
+def citizen_cabinet(request):
+    """Личный кабинет гражданина"""
+    if 'citizen_id' not in request.session:
+        messages.error(request, 'Пожалуйста, войдите в личный кабинет')
+        return redirect('citizen_login')
+
+    citizen = Citizen.objects.get(id=request.session['citizen_id'])
+    applications = SocialApplication.objects.filter(snils=citizen.snils).order_by('-created_at')
+
+    context = {
+        'citizen': citizen,
+        'applications': applications,
+    }
+    return render(request, 'applications/citizen_cabinet.html', context)
+
+
+def citizen_logout(request):
+    """Выход из личного кабинета"""
+    request.session.flush()
+    messages.success(request, 'Вы вышли из личного кабинета')
     return redirect('index')
 
 
-@login_required
-def user_profile(request):
-    """Личный кабинет пользователя"""
-    user = request.user
-    applications = SocialApplication.objects.filter(snils=user.username).order_by('-created_at')[:10]
+def analytics_dashboard(request):
+    """Отдельная страница аналитики"""
+
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, 'Доступ запрещен. Только для сотрудников.')
+        return redirect('operator_login')
+
+    # Общая статистика
+    total_applications = SocialApplication.objects.count()
+    new_applications = SocialApplication.objects.filter(status='new').count()
+    processing_applications = SocialApplication.objects.filter(status='processing').count()
+    completed_applications = SocialApplication.objects.filter(status='completed').count()
+    rejected_applications = SocialApplication.objects.filter(status='rejected').count()
+
+    # Процент выполнения
+    completion_rate = 0
+    if total_applications > 0:
+        completion_rate = round((completed_applications / total_applications) * 100, 1)
+
+    # Статистика по статусам для круговой диаграммы
+    status_stats = SocialApplication.objects.values('status').annotate(
+        count=Count('status')
+    )
+
+    status_labels = {
+        'new': 'Новые',
+        'processing': 'В обработке',
+        'completed': 'Выполненные',
+        'rejected': 'Отказанные'
+    }
+
+    status_data = {
+        'labels': [status_labels.get(item['status'], item['status']) for item in status_stats],
+        'counts': [item['count'] for item in status_stats],
+    }
+
+    # Динамика за последние 30 дней
+    last_30_days = timezone.now() - timedelta(days=30)
+    monthly_stats = SocialApplication.objects.filter(
+        created_at__gte=last_30_days
+    ).annotate(
+        date=TruncDate('created_at')
+    ).values('date').annotate(
+        count=Count('id')
+    ).order_by('date')
+
+    daily_data = {
+        'labels': [item['date'].strftime('%d.%m') for item in monthly_stats] if monthly_stats else [],
+        'counts': [item['count'] for item in monthly_stats] if monthly_stats else []
+    }
+
+    # Статистика по месяцам
+    monthly_data = SocialApplication.objects.annotate(
+        month=TruncMonth('created_at')
+    ).values('month').annotate(
+        count=Count('id')
+    ).order_by('month')
+
+    monthly_chart = {
+        'labels': [item['month'].strftime('%B %Y') for item in monthly_data] if monthly_data else [],
+        'counts': [item['count'] for item in monthly_data] if monthly_data else []
+    }
+
+    # Популярные услуги
+    popular_services = SocialApplication.objects.values('service_type').annotate(
+        count=Count('service_type')
+    ).order_by('-count')[:5]
+
+    services_data = {
+        'labels': [item['service_type'][:25] for item in popular_services],
+        'counts': [item['count'] for item in popular_services]
+    }
+
+    # Последние заявки
+    recent_applications = SocialApplication.objects.all().order_by('-created_at')[:10]
 
     context = {
-        'user': user,
-        'applications': applications,
+        'total_applications': total_applications,
+        'new_applications': new_applications,
+        'processing_applications': processing_applications,
+        'completed_applications': completed_applications,
+        'rejected_applications': rejected_applications,
+        'completion_rate': completion_rate,
+        'status_data': json.dumps(status_data),
+        'daily_data': json.dumps(daily_data),
+        'monthly_chart': json.dumps(monthly_chart),
+        'services_data': json.dumps(services_data),
+        'recent_applications': recent_applications,
     }
-    return render(request, 'applications/profile.html', context)
 
-
-@login_required
-def edit_profile(request):
-    """Редактирование профиля"""
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Профиль успешно обновлён!')
-            return redirect('user_profile')
-    else:
-        form = UserProfileForm(instance=request.user)
-
-    return render(request, 'applications/edit_profile.html', {'form': form})
-
-
-@login_required
-def my_applications(request):
-    """Мои заявки"""
-    applications = SocialApplication.objects.filter(snils=request.user.username).order_by('-created_at')
-
-    paginator = Paginator(applications, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    return render(request, 'applications/my_applications.html', {'page_obj': page_obj})
-
-def citizen_login(request):
-    """Вход для граждан в личный кабинет"""
-    return render(request, 'applications/citizen_login.html')
-
-def citizen_register(request):
-    """Регистрация граждан"""
-    return render(request, 'applications/citizen_register.html')
+    return render(request, 'applications/analytics.html', context)
