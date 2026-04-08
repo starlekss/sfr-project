@@ -17,4 +17,6 @@ urlpatterns = [
     path('citizen-cabinet/', views.citizen_cabinet, name='citizen_cabinet'),
     path('citizen-logout/', views.citizen_logout, name='citizen_logout'),
     path('analytics/', views.analytics_dashboard, name='analytics_dashboard'),
+    path('report/', views.report_form, name='report_form'),
+    path('export-report/', views.export_monthly_report, name='export_monthly_report'),
 ]

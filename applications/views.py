@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import FileResponse, JsonResponse
+from django.http import FileResponse, JsonResponse, HttpResponse
 from django.core.files.uploadedfile import UploadedFile
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import get_user_model
@@ -18,6 +18,14 @@ from django.db.models.functions import TruncDate, TruncMonth
 from datetime import datetime, timedelta
 from django.utils import timezone
 import json
+import io
+import xlsxwriter
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import mm
+import calendar
 
 User = get_user_model()
 
@@ -72,14 +80,14 @@ def index(request):
 
                 messages.success(
                     request,
-                    f'✅ Заявка №{application.id} успешно принята! Сохраните этот номер для отслеживания.'
+                    f'Заявка №{application.id} успешно принята! Сохраните этот номер для отслеживания.'
                 )
                 return redirect('index')
 
             except Exception as e:
                 logger.error(f"Ошибка при сохранении заявки: {e}")
                 logger.error(traceback.format_exc())
-                messages.error(request, f'❌ Ошибка при создании заявки: {str(e)}')
+                messages.error(request, f'Ошибка при создании заявки: {str(e)}')
         else:
             for field, errors in form.errors.items():
                 for error in errors:
@@ -401,3 +409,245 @@ def analytics_dashboard(request):
     }
 
     return render(request, 'applications/analytics.html', context)
+
+def export_monthly_report(request):
+    """Экспорт отчета за месяц (выбор формата)"""
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, 'Доступ запрещен')
+        return redirect('operator_login')
+
+    # Получаем выбранный месяц и год
+    month = int(request.GET.get('month', datetime.now().month))
+    year = int(request.GET.get('year', datetime.now().year))
+    format_type = request.GET.get('format', 'excel')
+
+    # Фильтруем заявки за выбранный месяц
+    start_date = datetime(year, month, 1)
+    if month == 12:
+        end_date = datetime(year + 1, 1, 1)
+    else:
+        end_date = datetime(year, month + 1, 1)
+
+    applications = SocialApplication.objects.filter(
+        created_at__gte=start_date,
+        created_at__lt=end_date
+    )
+
+    # Статистика
+    total_applications = applications.count()
+    new_applications = applications.filter(status='new').count()
+    processing_applications = applications.filter(status='processing').count()
+    completed_applications = applications.filter(status='completed').count()
+    rejected_applications = applications.filter(status='rejected').count()
+
+    # Статистика по услугам
+    services_stats = applications.values('service_type').annotate(
+        count=Count('id')
+    ).order_by('-count')[:10]
+
+    # Ежедневная статистика
+    daily_stats = []
+    days_in_month = calendar.monthrange(year, month)[1]
+    for day in range(1, days_in_month + 1):
+        day_start = datetime(year, month, day)
+        day_end = datetime(year, month, day + 1) if day < days_in_month else end_date
+        day_apps = applications.filter(created_at__gte=day_start, created_at__lt=day_end)
+        daily_stats.append({
+            'date': f"{day}.{month}.{year}",
+            'count': day_apps.count(),
+            'completed': day_apps.filter(status='completed').count()
+        })
+
+    if format_type == 'excel':
+        return export_to_excel(applications, daily_stats, services_stats, month, year, total_applications,
+                               new_applications, processing_applications, completed_applications, rejected_applications)
+    else:
+        return export_to_pdf(applications, daily_stats, services_stats, month, year, total_applications,
+                             new_applications, processing_applications, completed_applications, rejected_applications)
+
+
+def export_to_excel(applications, daily_stats, services_stats, month, year, total, new, processing, completed,
+                    rejected):
+    """Экспорт в Excel"""
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(output)
+
+    # Стили
+    header_format = workbook.add_format({
+        'bold': True,
+        'bg_color': '#0054a6',
+        'font_color': 'white',
+        'border': 1,
+        'align': 'center'
+    })
+
+    title_format = workbook.add_format({
+        'bold': True,
+        'font_size': 14,
+        'align': 'center'
+    })
+
+    # Лист 1: Общая статистика
+    ws_stats = workbook.add_worksheet('Статистика')
+    ws_stats.merge_range('A1:D1', f'Отчет за {calendar.month_name[month]} {year} года', title_format)
+    ws_stats.write_row(2, 0, ['Показатель', 'Значение'], header_format)
+
+    stats_data = [
+        ['Всего заявок', total],
+        ['Новые', new],
+        ['В обработке', processing],
+        ['Выполнено', completed],
+        ['Отказано', rejected],
+        ['Процент выполнения', f"{round(completed / total * 100, 1) if total > 0 else 0}%"]
+    ]
+
+    for row, data in enumerate(stats_data, start=3):
+        ws_stats.write_row(row, 0, data)
+
+    # Лист 2: Ежедневная статистика
+    ws_daily = workbook.add_worksheet('По дням')
+    ws_daily.write_row(0, 0, ['Дата', 'Заявок', 'Выполнено'], header_format)
+
+    for row, data in enumerate(daily_stats, start=1):
+        ws_daily.write_row(row, 0, [data['date'], data['count'], data['completed']])
+
+    # Лист 3: Услуги
+    ws_services = workbook.add_worksheet('Услуги')
+    ws_services.write_row(0, 0, ['Услуга', 'Количество'], header_format)
+
+    for row, service in enumerate(services_stats, start=1):
+        ws_services.write_row(row, 0, [service['service_type'], service['count']])
+
+    # Лист 4: Все заявки
+    ws_apps = workbook.add_worksheet('Заявки')
+    headers = ['ID', 'ФИО', 'СНИЛС', 'Тип услуги', 'Статус', 'Дата создания']
+    ws_apps.write_row(0, 0, headers, header_format)
+
+    for row, app in enumerate(applications, start=1):
+        ws_apps.write_row(row, 0, [
+            app.id,
+            f"{app.last_name} {app.first_name} {app.patronymic}",
+            app.snils,
+            app.service_type,
+            app.get_status_display(),
+            app.created_at.strftime('%d.%m.%Y %H:%M')
+        ])
+
+    # Автоширина колонок
+    for worksheet in [ws_stats, ws_daily, ws_services, ws_apps]:
+        worksheet.autofilter(0, 0, worksheet.dim_rowmax, worksheet.dim_colmax)
+        worksheet.set_column(0, 10, 20)
+
+    workbook.close()
+    output.seek(0)
+
+    response = HttpResponse(
+        output.read(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="report_{year}_{month}.xlsx"'
+    return response
+
+
+def export_to_pdf(applications, daily_stats, services_stats, month, year, total, new, processing, completed, rejected):
+    """Экспорт в PDF"""
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="report_{year}_{month}.pdf"'
+
+    doc = SimpleDocTemplate(response, pagesize=A4, topMargin=20 * mm, bottomMargin=20 * mm)
+    styles = getSampleStyleSheet()
+
+    # Русский стиль
+    styles.add(ParagraphStyle(name='Russian', fontName='Helvetica', fontSize=10, leading=14))
+    styles.add(ParagraphStyle(name='Title', fontName='Helvetica-Bold', fontSize=16, leading=20))
+    styles.add(ParagraphStyle(name='Header', fontName='Helvetica-Bold', fontSize=12, leading=16))
+
+    story = []
+
+    # Заголовок
+    story.append(Paragraph(f"Отчет за {calendar.month_name[month]} {year} года", styles['Title']))
+    story.append(Spacer(1, 10))
+    story.append(Paragraph(f"Дата формирования: {datetime.now().strftime('%d.%m.%Y %H:%M')}", styles['Russian']))
+    story.append(Spacer(1, 20))
+
+    # Общая статистика
+    story.append(Paragraph("1. Общая статистика", styles['Header']))
+    story.append(Spacer(1, 10))
+
+    stats_table = Table([
+        ['Показатель', 'Значение'],
+        ['Всего заявок', str(total)],
+        ['Новые', str(new)],
+        ['В обработке', str(processing)],
+        ['Выполнено', str(completed)],
+        ['Отказано', str(rejected)],
+        ['Процент выполнения', f"{round(completed / total * 100, 1) if total > 0 else 0}%"]
+    ], colWidths=[100 * mm, 80 * mm])
+
+    stats_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0054a6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+
+    story.append(stats_table)
+    story.append(Spacer(1, 20))
+
+    # Ежедневная статистика
+    story.append(Paragraph("2. Ежедневная статистика", styles['Header']))
+    story.append(Spacer(1, 10))
+
+    daily_table_data = [['Дата', 'Заявок', 'Выполнено']]
+    for data in daily_stats:
+        daily_table_data.append([data['date'], str(data['count']), str(data['completed'])])
+
+    daily_table = Table(daily_table_data, colWidths=[60 * mm, 60 * mm, 60 * mm])
+    daily_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0054a6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('PADDING', (0, 0), (-1, -1), 5),
+    ]))
+
+    story.append(daily_table)
+    story.append(Spacer(1, 20))
+
+    # Услуги
+    story.append(Paragraph("3. Популярные услуги", styles['Header']))
+    story.append(Spacer(1, 10))
+
+    services_table_data = [['Услуга', 'Количество']]
+    for service in services_stats:
+        services_table_data.append([service['service_type'], str(service['count'])])
+
+    services_table = Table(services_table_data, colWidths=[120 * mm, 60 * mm])
+    services_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0054a6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('PADDING', (0, 0), (-1, -1), 5),
+    ]))
+
+    story.append(services_table)
+
+    doc.build(story)
+    return response
+
+
+def report_form(request):
+    """Форма выбора месяца для отчета"""
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, 'Доступ запрещен')
+        return redirect('operator_login')
+
+    current_year = datetime.now().year
+    years = range(current_year - 2, current_year + 2)
+
+    return render(request, 'applications/report_form.html', {'years': years})
