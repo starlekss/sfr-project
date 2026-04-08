@@ -7,6 +7,7 @@ from django.http import FileResponse, JsonResponse, HttpResponse
 from django.core.files.uploadedfile import UploadedFile
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from .models import SocialApplication, Operator, Citizen
 from .forms import SocialApplicationForm
 from loguru import logger
@@ -251,6 +252,7 @@ def citizen_login(request):
 
     return render(request, 'applications/citizen_login.html')
 
+# applications/views.py (добавьте в конец файла)
 
 def citizen_register(request):
     """Регистрация гражданина"""
@@ -295,20 +297,32 @@ def citizen_register(request):
     return render(request, 'applications/citizen_register.html')
 
 
-def citizen_cabinet(request):
-    """Личный кабинет гражданина"""
-    if 'citizen_id' not in request.session:
-        messages.error(request, 'Пожалуйста, войдите в личный кабинет')
-        return redirect('citizen_login')
+def citizen_login(request):
+    """Вход гражданина в личный кабинет"""
+    if request.method == 'POST':
+        snils = request.POST.get('snils')
+        password = request.POST.get('password')
 
-    citizen = Citizen.objects.get(id=request.session['citizen_id'])
-    applications = SocialApplication.objects.filter(snils=citizen.snils).order_by('-created_at')
+        try:
+            citizen = Citizen.objects.get(snils=snils)
+            if check_password(password, citizen.password):
+                # Обновляем время последнего входа
+                citizen.last_login = timezone.now()
+                citizen.save()
 
-    context = {
-        'citizen': citizen,
-        'applications': applications,
-    }
-    return render(request, 'applications/citizen_cabinet.html', context)
+                # Сохраняем в сессию
+                request.session['citizen_id'] = citizen.id
+                request.session['citizen_name'] = f"{citizen.last_name} {citizen.first_name}"
+                request.session.set_expiry(86400)  # 24 часа
+
+                messages.success(request, f'Добро пожаловать, {citizen.first_name}!')
+                return redirect('citizen_cabinet')
+            else:
+                messages.error(request, 'Неверный пароль')
+        except Citizen.DoesNotExist:
+            messages.error(request, 'Пользователь с таким СНИЛС не найден')
+
+    return render(request, 'applications/citizen_login.html')
 
 
 def citizen_logout(request):
@@ -317,6 +331,27 @@ def citizen_logout(request):
     messages.success(request, 'Вы вышли из личного кабинета')
     return redirect('index')
 
+
+def citizen_cabinet(request):
+    """Личный кабинет гражданина"""
+    if 'citizen_id' not in request.session:
+        messages.error(request, 'Пожалуйста, войдите в личный кабинет')
+        return redirect('citizen_login')
+
+    try:
+        citizen = Citizen.objects.get(id=request.session['citizen_id'])
+    except Citizen.DoesNotExist:
+        request.session.flush()
+        messages.error(request, 'Сессия истекла. Пожалуйста, войдите снова.')
+        return redirect('citizen_login')
+
+    applications = SocialApplication.objects.filter(snils=citizen.snils).order_by('-created_at')
+
+    context = {
+        'citizen': citizen,
+        'applications': applications,
+    }
+    return render(request, 'applications/citizen_cabinet.html', context)
 
 def analytics_dashboard(request):
     """Отдельная страница аналитики"""
