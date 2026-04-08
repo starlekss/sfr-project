@@ -6,27 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>СФР - Социальный фонд России | Приём заявок</title>
 
+    <!-- Иконки -->
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'applications/images/apple-touch-icon.png' %}">
-
     <link rel="icon" type="image/x-icon" href="{% static 'applications/images/favicon.ico' %}">
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'applications/images/favicon.ico' %}">
-
     <link rel="icon" type="image/png" sizes="96x96" href="{% static 'applications/images/favicon-96x96.png' %}">
-
     <link rel="icon" type="image/png" sizes="192x192" href="{% static 'applications/images/web-app-manifest-192x192.png' %}">
-
     <link rel="icon" type="image/png" sizes="512x512" href="{% static 'applications/images/web-app-manifest-512x512.png' %}">
-
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'applications/images/favicon-96x96.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'applications/images/favicon-96x96.png' %}">
 
+    <!-- Bootstrap и другие стили -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ&lang=ru_RU" type="text/javascript"></script>
 
     <style>
-
+        /* ========================================
+           ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        ======================================== */
         :root {
             --sfr-blue: #0054a6;
             --sfr-blue-dark: #003d7a;
@@ -141,11 +140,11 @@
             background: var(--sfr-blue);
         }
 
+        /* Блок статистики */
         .stats-section {
             background: linear-gradient(135deg, var(--sfr-blue) 0%, var(--sfr-blue-dark) 100%);
             padding: 40px 0;
             margin-bottom: 40px;
-            border-radius: 0;
             position: relative;
             overflow: hidden;
         }
@@ -577,6 +576,16 @@
             text-decoration: none;
         }
 
+        .consent-text a:hover {
+            text-decoration: underline;
+            color: var(--sfr-blue-dark);
+        }
+
+        .consent-text a[target="_blank"]::after {
+            content: " ↗";
+            font-size: 11px;
+        }
+
         /* Кнопки */
         .btn-primary-custom {
             background: linear-gradient(135deg, var(--sfr-blue), var(--sfr-blue-dark));
@@ -940,24 +949,6 @@
             color: var(--white);
         }
 
-        /* Стили для ссылки на политику */
-        .consent-text a {
-        color: var(--sfr-blue);
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.2s;
-        }
-
-        .consent-text a:hover {
-        text-decoration: underline;
-        color: var(--sfr-blue-dark);
-        }
-
-/* Стили для открытия ссылки в новой вкладке */
-.consent-text a[target="_blank"]::after {
-    content: " ↗";
-    font-size: 11px;
-}
         /* Анимации */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
@@ -983,7 +974,6 @@
             animation: slideInRight 0.3s ease forwards;
         }
 
-        /* Анимация для цифр статистики */
         @keyframes countUp {
             from {
                 opacity: 0;
@@ -999,7 +989,10 @@
             animation: countUp 0.8s ease-out;
         }
 
-        /* Адаптивность */
+        /* ========================================
+           МОБИЛЬНАЯ АДАПТАЦИЯ
+        ======================================== */
+
         @media (max-width: 768px) {
             .stat-number {
                 font-size: 32px;
@@ -1009,47 +1002,239 @@
             }
             .action-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .action-card {
+                padding: 15px 10px;
+            }
+            .action-icon {
+                width: 45px;
+                height: 45px;
+            }
+            .action-icon i {
+                font-size: 20px;
+            }
+            .action-title {
+                font-size: 13px;
+            }
+            .action-desc {
+                font-size: 10px;
             }
             .form-card {
-                padding: 24px;
+                padding: 20px;
+                margin: 0 10px;
             }
             .form-title {
-                font-size: 24px;
+                font-size: 20px;
+            }
+            .form-subtitle {
+                font-size: 12px;
+            }
+            .form-section {
+                padding: 15px;
+            }
+            .section-header h5 {
+                font-size: 16px;
+            }
+            .form-label {
+                font-size: 13px;
+            }
+            .form-control, .form-select {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+            .upload-card {
+                margin-bottom: 15px;
+            }
+            .btn-primary-custom, .btn-outline-custom, .btn-gold-custom {
+                padding: 10px 20px;
+                font-size: 14px;
             }
             .form-actions {
                 flex-direction: column;
+                gap: 10px;
             }
-            .btn-primary-custom, .btn-outline-custom {
+            .form-actions .btn-primary-custom,
+            .form-actions .btn-outline-custom {
+                width: 100%;
+            }
+            .applications-table,
+            .table {
+                font-size: 12px;
+            }
+            .applications-table th,
+            .applications-table td,
+            .table th,
+            .table td {
+                padding: 8px 10px;
+            }
+            .offices-list {
+                margin-bottom: 20px;
+            }
+            .office-card {
+                padding: 12px;
+            }
+            .office-name {
+                font-size: 14px;
+            }
+            .office-address, .office-hours, .office-phone {
+                font-size: 11px;
+            }
+            .map-container {
+                height: 250px;
+            }
+            .calculator-card {
+                padding: 15px;
+            }
+            .calculator-result {
+                margin-top: 20px;
+            }
+            .calculator-result .amount {
+                font-size: 24px;
+            }
+            .chat-window {
+                width: 280px;
+                right: -15px;
+                bottom: 70px;
+            }
+            .chat-messages {
+                height: 250px;
+            }
+            .quick-reply {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+            .footer {
+                text-align: center;
+                padding: 30px 0 20px;
+            }
+            .footer .row {
+                flex-direction: column;
+            }
+            .footer .col-md-4,
+            .footer .col-md-3,
+            .footer .col-md-2 {
+                margin-bottom: 20px;
+            }
+            .main-header .row {
+                flex-direction: column;
+                text-align: center;
+            }
+            .logo {
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+            .logo h1 {
+                font-size: 18px;
+            }
+            .logo p {
+                font-size: 10px;
+            }
+            .gov-badge {
+                display: inline-block;
+                margin-top: 5px;
+            }
+            .top-bar .row {
+                flex-direction: column;
+                text-align: center;
+                gap: 5px;
+            }
+            .top-bar .col-6 {
                 width: 100%;
                 text-align: center;
+            }
+            .nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .nav-item {
+                width: auto;
+            }
+            .nav-link-custom {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .stats-section .row {
+                flex-direction: column;
+            }
+            .stat-card {
+                margin-bottom: 20px;
+            }
+            button,
+            .btn,
+            .action-card,
+            .service-card,
+            .nav-link-custom,
+            .office-card {
+                cursor: pointer;
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            input,
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-number {
+                font-size: 28px;
+            }
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-card {
+                padding: 15px;
+                margin: 0 5px;
+            }
+            .form-title {
+                font-size: 18px;
             }
             .section-header {
                 flex-wrap: wrap;
             }
             .optional-badge {
                 margin-left: 0;
-            }
-            .chat-window {
-                width: 280px;
-                right: -15px;
-            }
-            .map-container {
-                height: 300px;
-                margin-top: 15px;
-            }
-            .logo h1 {
-                font-size: 18px;
+                margin-top: 5px;
             }
             .nav-link-custom {
-                padding: 8px 12px;
-                font-size: 13px;
+                padding: 6px 10px;
+                font-size: 11px;
             }
-            .applications-table {
-                font-size: 12px;
+            .applications-table th:nth-child(4),
+            .applications-table td:nth-child(4),
+            .table th:nth-child(4),
+            .table td:nth-child(4) {
+                display: none;
             }
-            .applications-table th,
-            .applications-table td {
-                padding: 8px 10px;
+            .chat-window {
+                width: 260px;
+                right: -20px;
+            }
+            .quick-replies {
+                gap: 4px;
+            }
+            .quick-reply {
+                font-size: 9px;
+                padding: 3px 6px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 992px) {
+            .action-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-card {
+                padding: 30px;
+            }
+            .stat-number {
+                font-size: 36px;
+            }
+            .map-container {
+                height: 350px;
             }
         }
     </style>
@@ -1080,10 +1265,10 @@
                          alt="Логотип Социального фонда России"
                          style="height: 55px; width: auto; margin-right: 15px;">
                     <div>
-        <h1 class="mb-0">Социальный фонд России</h1>
-        <p class="mb-0">Прием заявок по Самарской области</p>
-    </div>
-</div>
+                        <h1 class="mb-0">Социальный фонд России</h1>
+                        <p class="mb-0">Прием заявок по Самарской области</p>
+                    </div>
+                </div>
             </div>
             <div class="col-md-5 text-end">
                 <div class="gov-badge d-inline-block">
@@ -1106,7 +1291,6 @@
             </li>
 
             {% if request.resolver_match.url_name == 'index' %}
-                <!-- На главной странице -->
                 <li class="nav-item">
                     <a class="nav-link-custom" href="#calculator">
                         <i class="fas fa-calculator me-1"></i> Калькулятор
@@ -1122,8 +1306,6 @@
                         <i class="fas fa-list me-1"></i> Услуги
                     </a>
                 </li>
-
-                <!-- Кнопки входа в правом углу -->
                 <li class="nav-item ms-auto">
                     <a class="nav-link-custom" href="{% url 'citizen_login' %}">
                         <i class="fas fa-user me-1"></i> Личный кабинет
@@ -1136,7 +1318,6 @@
                 </li>
 
             {% elif request.resolver_match.url_name == 'search_application' %}
-                <!-- На странице поиска -->
                 <li class="nav-item">
                     <a class="nav-link-custom" href="#calculator">
                         <i class="fas fa-calculator me-1"></i> Калькулятор
@@ -1164,7 +1345,6 @@
                 </li>
 
             {% else %}
-                <!-- На остальных страницах -->
                 <li class="nav-item">
                     <a class="nav-link-custom" href="{% url 'search_application' %}">
                         <i class="fas fa-search me-1"></i> Проверить статус
@@ -1391,7 +1571,6 @@
     </div>
 </footer>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function animateNumbers() {
@@ -1523,370 +1702,6 @@
     }, 1000);
 
     document.addEventListener('DOMContentLoaded', animateNumbers);
-   
-/* Для экранов меньше 768px (планшеты и телефоны) */
-@media (max-width: 768px) {
-    /* Навигация - гамбургер меню */
-    .nav {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .nav-item {
-        width: auto;
-    }
-
-    .nav-link-custom {
-        padding: 8px 12px;
-        font-size: 13px;
-    }
-
-    /* Карточки статистики */
-    .stats-section .row {
-        flex-direction: column;
-    }
-
-    .stat-card {
-        margin-bottom: 20px;
-    }
-
-    .stat-number {
-        font-size: 32px;
-    }
-
-    .stat-label {
-        font-size: 11px;
-    }
-
-    /* Быстрые действия */
-    .action-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-
-    .action-card {
-        padding: 15px 10px;
-    }
-
-    .action-icon {
-        width: 45px;
-        height: 45px;
-    }
-
-    .action-icon i {
-        font-size: 20px;
-    }
-
-    .action-title {
-        font-size: 13px;
-    }
-
-    .action-desc {
-        font-size: 10px;
-    }
-
-    /* Форма */
-    .form-card {
-        padding: 20px;
-        margin: 0 10px;
-    }
-
-    .form-title {
-        font-size: 20px;
-    }
-
-    .form-subtitle {
-        font-size: 12px;
-    }
-
-    .form-section {
-        padding: 15px;
-    }
-
-    .section-header h5 {
-        font-size: 16px;
-    }
-
-    .form-label {
-        font-size: 13px;
-    }
-
-    .form-control, .form-select {
-        font-size: 13px;
-        padding: 10px 12px;
-    }
-
-    /* Карточки загрузки файлов */
-    .upload-card {
-        margin-bottom: 15px;
-    }
-
-    /* Кнопки */
-    .btn-primary-custom, .btn-outline-custom, .btn-gold-custom {
-        padding: 10px 20px;
-        font-size: 14px;
-    }
-
-    .form-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .form-actions .btn-primary-custom,
-    .form-actions .btn-outline-custom {
-        width: 100%;
-    }
-
-    /* Таблицы */
-    .applications-table,
-    .table {
-        font-size: 12px;
-    }
-
-    .applications-table th,
-    .applications-table td,
-    .table th,
-    .table td {
-        padding: 8px 10px;
-    }
-
-    /* Карта отделений */
-    .offices-list {
-        margin-bottom: 20px;
-    }
-
-    .office-card {
-        padding: 12px;
-    }
-
-    .office-name {
-        font-size: 14px;
-    }
-
-    .office-address, .office-hours, .office-phone {
-        font-size: 11px;
-    }
-
-    .map-container {
-        height: 250px;
-    }
-
-    /* Калькулятор пенсии */
-    .calculator-card {
-        padding: 15px;
-    }
-
-    .calculator-result {
-        margin-top: 20px;
-    }
-
-    .calculator-result .amount {
-        font-size: 24px;
-    }
-
-    /* Чат-бот */
-    .chat-window {
-        width: 280px;
-        right: -15px;
-        bottom: 70px;
-    }
-
-    .chat-messages {
-        height: 250px;
-    }
-
-    .quick-reply {
-        font-size: 10px;
-        padding: 4px 8px;
-    }
-
-    /* Футер */
-    .footer {
-        text-align: center;
-        padding: 30px 0 20px;
-    }
-
-    .footer .row {
-        flex-direction: column;
-    }
-
-    .footer .col-md-4,
-    .footer .col-md-3,
-    .footer .col-md-2 {
-        margin-bottom: 20px;
-    }
-
-    /* Хедер */
-    .main-header .row {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .logo {
-        justify-content: center;
-        margin-bottom: 10px;
-    }
-
-    .logo h1 {
-        font-size: 18px;
-    }
-
-    .logo p {
-        font-size: 10px;
-    }
-
-    .gov-badge {
-        display: inline-block;
-        margin-top: 5px;
-    }
-
-    /* Верхняя панель */
-    .top-bar .row {
-        flex-direction: column;
-        text-align: center;
-        gap: 5px;
-    }
-
-    .top-bar .col-6 {
-        width: 100%;
-        text-align: center;
-    }
-
-    /* Кнопка установки PWA */
-    .pwa-install-btn {
-        bottom: 80px;
-        right: 10px;
-        padding: 8px 16px;
-        font-size: 11px;
-    }
-
-    /* Кнопка переключения темы */
-    .theme-toggle {
-        bottom: 15px;
-        right: 15px;
-        width: 40px;
-        height: 40px;
-    }
-
-    .theme-toggle i {
-        font-size: 18px;
-    }
-}
-
-/* Для экранов меньше 480px (маленькие телефоны) */
-@media (max-width: 480px) {
-    .stat-number {
-        font-size: 28px;
-    }
-
-    .action-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-card {
-        padding: 15px;
-        margin: 0 5px;
-    }
-
-    .form-title {
-        font-size: 18px;
-    }
-
-    .section-header {
-        flex-wrap: wrap;
-    }
-
-    .optional-badge {
-        margin-left: 0;
-        margin-top: 5px;
-    }
-
-    .nav-link-custom {
-        padding: 6px 10px;
-        font-size: 11px;
-    }
-
-    .applications-table th:nth-child(4),
-    .applications-table td:nth-child(4),
-    .table th:nth-child(4),
-    .table td:nth-child(4) {
-        display: none;
-    }
-
-    .chat-window {
-        width: 260px;
-        right: -20px;
-    }
-
-    .quick-replies {
-        gap: 4px;
-    }
-
-    .quick-reply {
-        font-size: 9px;
-        padding: 3px 6px;
-    }
-}
-
-/* Для экранов между 768px и 992px (планшеты) */
-@media (min-width: 769px) and (max-width: 992px) {
-    .action-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .form-card {
-        padding: 30px;
-    }
-
-    .stat-number {
-        font-size: 36px;
-    }
-
-    .map-container {
-        height: 350px;
-    }
-}
-
-/* Гамбургер-меню для мобильных (дополнительно) */
-.mobile-menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: var(--sfr-blue);
-    cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    .mobile-menu-toggle {
-        display: block;
-        position: absolute;
-        top: 20px;
-        right: 20px;
-    }
-}
-
-/* Улучшение таргетинга для мобильных */
-@media (max-width: 768px) {
-    button,
-    .btn,
-    .action-card,
-    .service-card,
-    .nav-link-custom,
-    .office-card {
-        cursor: pointer;
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    input,
-    select,
-    textarea {
-        font-size: 16px !important;
-    }
-}
 </script>
 
 {% block extra_js %}{% endblock %}
